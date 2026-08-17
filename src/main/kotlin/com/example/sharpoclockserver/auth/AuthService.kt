@@ -11,12 +11,15 @@ import org.springframework.http.ResponseEntity
 import org.springframework.mail.MailSendException
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
+import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
@@ -32,15 +35,15 @@ class AuthService(
 
     private val passwordEncoder: PasswordEncoder,
     private val jwtEncoder: JwtEncoder,
-    @param:Value($$"${app.jwt.issuer}")
+    @Value($$"${app.jwt.issuer}")
     private val jwtIssuer: String,
-    @param:Value($$"${app.jwt.audience}")
+    @Value($$"${app.jwt.audience}")
     private val jwtAudience: String,
-    @param:Value($$"${app.jwt.client-id}")
+    @Value($$"${app.jwt.client-id}")
     private val jwtClientId: String,
-    @param:Value($$"${app.jwt.access-token-expiry-seconds}")
+    @Value($$"${app.jwt.access-token-expiry-seconds}")
     private val accessTokenExpirySeconds: Long,
-    @param:Value($$"${app.jwt.refresh-token-expiry-seconds}")
+    @Value($$"${app.jwt.refresh-token-expiry-seconds}")
     private val refreshTokenExpirySeconds: Long,
 
     private val mailSender: JavaMailSender,
@@ -283,6 +286,13 @@ class AuthService(
             ),
             HttpStatus.OK
         )
+    }
+
+    fun resetPassword(
+        resetPasswordRequest: AuthController.ResetPasswordRequest
+    ): ResponseEntity<*> {
+        //TODO
+        return ResponseEntity.ok().body("placeholder")
     }
 
     private fun invalidRefreshToken(): ResponseEntity<*> =

@@ -54,6 +54,11 @@ class AuthController(
         val refreshExpiresAt: Instant,
     )
 
+    data class ResetPasswordRequest(
+        val identifier: String,
+        val newPassword: String,
+    )
+
     @PostMapping("/sign-in")
     fun signIn(
         @RequestBody signInRequest: SignInRequest
@@ -73,4 +78,9 @@ class AuthController(
     fun refresh(
         @RequestBody refreshRequest: RefreshRequest
     ) = authService.refresh(refreshRequest)
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @RequestBody resetPasswordRequest: ResetPasswordRequest
+    ) = authService.resetPassword(resetPasswordRequest)
 }
