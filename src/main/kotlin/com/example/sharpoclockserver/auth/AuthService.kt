@@ -8,6 +8,9 @@ import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.mail.MailSendException
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwsHeader
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
 
@@ -25,6 +29,7 @@ import java.util.*
 class AuthService(
     private val customerRepository: CustomerRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
+
     private val passwordEncoder: PasswordEncoder,
     private val jwtEncoder: JwtEncoder,
     @param:Value($$"${app.jwt.issuer}")
@@ -37,10 +42,31 @@ class AuthService(
     private val accessTokenExpirySeconds: Long,
     @param:Value($$"${app.jwt.refresh-token-expiry-seconds}")
     private val refreshTokenExpirySeconds: Long,
+
+    private val mailSender: JavaMailSender,
+    @Value($$"${app.mail.from}")
+    private val mailFrom: String,
 ) {
 
     private val secureRandom = SecureRandom()
 
+    private fun sendEmail(
+        recipientMailAddress: String,
+        subject: String,
+        body: String,
+    ) {
+        val message = mailSender.createMimeMessage()
+        val helper = MimeMessageHelper(message, false, StandardCharsets.UTF_8.name())
+
+        helper.setFrom(mailFrom)
+        helper.setTo(recipientMailAddress)
+        helper.setSubject(subject)
+        helper.setText(body, true)
+
+        mailSender.send(message)
+    }
+
+    @Transactional
     fun createCustomer(
         signUpRequest: AuthController.SignUpRequest
     ): ResponseEntity<*> {
@@ -64,12 +90,66 @@ class AuthService(
             password = hashedPassword,
 
             age = signUpRequest.age,
+            addressLine = signUpRequest.addressLine,
 
             lastSignedInAtList = listOf(Instant.now()),
             lastSignedInDeviceList = signUpRequest.joinedDevice?.let(::listOf) ?: emptyList(),
         )
 
         customerRepository.save(customer)
+
+        try {
+            sendEmail(
+                signUpRequest.email,
+                "Welcome to Sharp O\'clock",
+                """
+                <!doctype html>
+                <html>
+                  <head>
+                    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
+                  </head>
+                  <body style=3D"font-family: sans-serif;">
+                Dear <b>${signUpRequest.fullName}</b>,
+                <br/>
+                Welcome to our shop! Enjoy your stay.
+                <br/>
+                The below block is information regarding your account:
+                <br/>
+                <ul>
+                <li>Full name: ${customer.fullName}</li>
+                <li>Pseudo: ${customer.pseudo}</li>
+                <li>Email: ${customer.email}</li>
+                <li>Address: ${customer.addressLine}</li>
+                <li>Age: ${customer.age}</li>
+                <li>Last connected at: ${
+                    customer.lastSignedInAtList.joinToString(", ") {
+                        SimpleDateFormat(
+                            "dd/MM/yyyy @HH:mm a",
+                            Locale.getDefault()
+                        ).format(Date.from(it))
+                    }
+                }</li>
+                <li>Last joined from: ${
+                    customer.lastSignedInDeviceList.joinToString(", ") {
+                        it.toString()
+                    }
+                }
+                </li>
+                </ul>
+                <br/>
+                Best Regards,
+                <br/>
+                <i>Sharp O'Clock Dev Team.</i>.
+                </body>
+                </html>
+            """.trimIndent()
+            )
+        } catch (e: MailSendException) {
+            return ResponseEntity(
+                "Could not send a welcome e-mail to ${customer.id}/${customer.email}: ${e.message}",
+                HttpStatus.CONFLICT
+            )
+        }
 
         return ResponseEntity(
             "Customer successfully created!",
