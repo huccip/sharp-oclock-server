@@ -1,18 +1,15 @@
 package com.example.sharpoclockserver.auth
 
 import com.example.sharpoclockserver.model.RegisteredDevice
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
 // POST http://localhost:8080/auth/sign-in
 // POST http://localhost:8080/auth/sign-up
 // POST http://localhost:8080/auth/sign-out
 // POST http://localhost:8080/auth/refresh
+// POST http://localhost:8080/auth/password-reset/request
+// POST http://localhost:8080/auth/password-reset/confirm
 
 @RestController
 @RequestMapping("/auth")
@@ -23,8 +20,7 @@ class AuthController(
     data class SignInRequest(
         val identifier: String,
         val password: String,
-        val lastSignedInAt: Instant = Instant.now(),
-        val lastSignedInDevice: RegisteredDevice? = null,
+        val lastSignedInDevice: RegisteredDevice,
     )
 
     data class SignUpRequest(
@@ -38,8 +34,7 @@ class AuthController(
         val age: Int? = null,
         val phoneNumber: String? = null,
         val addressLine: String? = null,
-        val joinedAt: Instant = Instant.now(),
-        val joinedDevice: RegisteredDevice? = null,
+        val joinedDevice: RegisteredDevice
     )
 
     data class RefreshRequest(
@@ -54,9 +49,14 @@ class AuthController(
         val refreshExpiresAt: Instant,
     )
 
-    data class ResetPasswordRequest(
+    data class PasswordResetRequest(
         val identifier: String,
-        val newPassword: String,
+    )
+
+    data class PasswordResetConfirmRequest(
+        val identifier: String,
+        val otp: String,
+        val newPassword: String
     )
 
     @PostMapping("/sign-in")
@@ -79,8 +79,15 @@ class AuthController(
         @RequestBody refreshRequest: RefreshRequest
     ) = authService.refresh(refreshRequest)
 
-    @PostMapping("/reset-password")
-    fun resetPassword(
-        @RequestBody resetPasswordRequest: ResetPasswordRequest
-    ) = authService.resetPassword(resetPasswordRequest)
+    // will send OTP in the inbox (if the identifier exists)
+    @PostMapping("/password-reset/request")
+    fun requestPasswordReset(
+        @RequestBody passwordResetRequest: PasswordResetRequest
+    ) = authService.requestPasswordReset(passwordResetRequest)
+
+    // will validate the OTP and sets the new password and signs the customer out everywhere
+    @PostMapping("/password-reset/confirm")
+    fun confirmPasswordReset(
+        @RequestBody passwordResetConfirmRequest: PasswordResetConfirmRequest
+    ) = authService.confirmPasswordReset(passwordResetConfirmRequest)
 }

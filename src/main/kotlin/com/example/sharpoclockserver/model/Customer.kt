@@ -17,23 +17,24 @@ data class Customer(
     val fullName: String,
     @Column(nullable = false, unique = true)
     val pseudo: String,
+    @Column(nullable = false)
+    var password: String,
+
     @Column(name = "phone_number", unique = true)
     val phoneNumber: String? = null,
-    @Column(nullable = false)
-    val password: String,
     @Column(name = "address_line")
     val addressLine: String? = null,
+    /** will be used for the recommendation system (AI recommends articles (watches) depending on customer age) */
     @Column
     val age: Int? = null,
-    /** will be used for the recommendation system (AI recommends articles (watches) depending on customer age) */
-
-    @Column(name = "last_signed_in_at_list", nullable = false)
-    val lastSignedInAtList: List<Instant>,
 
     @ElementCollection
     @CollectionTable(
         name = "customer_registered_devices",
         joinColumns = [JoinColumn(name = "customer_id")],
     )
-    val lastSignedInDeviceList: List<RegisteredDevice>,
+    var lastSignedInDeviceList: List<RegisteredDevice>,
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: Instant,
 )

@@ -1,30 +1,29 @@
 package com.example.sharpoclockserver.auth
 
+import com.example.sharpoclockserver.email.EmailService
 import com.example.sharpoclockserver.model.Customer
+import com.example.sharpoclockserver.model.PasswordResetChallenge
 import com.example.sharpoclockserver.model.RefreshToken
 import com.example.sharpoclockserver.model.repository.CustomerRepository
+import com.example.sharpoclockserver.model.repository.PasswordResetChallengeRepository
 import com.example.sharpoclockserver.model.repository.RefreshTokenRepository
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.codec.EncodingException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.mail.MailException
 import org.springframework.mail.MailSendException
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.MimeMessageHelper
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwsHeader
 import org.springframework.security.oauth2.jwt.JwtClaimsSet
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters
-import org.springframework.security.provisioning.InMemoryUserDetailsManager
 import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.util.*
 
@@ -46,28 +45,18 @@ class AuthService(
     @Value($$"${app.jwt.refresh-token-expiry-seconds}")
     private val refreshTokenExpirySeconds: Long,
 
-    private val mailSender: JavaMailSender,
-    @Value($$"${app.mail.from}")
-    private val mailFrom: String,
+    private val passwordResetChallengeRepository: PasswordResetChallengeRepository,
+    @Value($$"${app.password-reset.otp-expiry-seconds}")
+    private val otpExpirySeconds: Long,
+    @Value($$"${app.password-reset.otp-resend-cooldown-seconds}")
+    private val otpResendCooldownSeconds: Long,
+    @Value($$"${app.password-reset.otp-max-attempts}")
+    private val otpMaxAttempts: Int,
+
+    private val emailService: EmailService,
 ) {
 
     private val secureRandom = SecureRandom()
-
-    private fun sendEmail(
-        recipientMailAddress: String,
-        subject: String,
-        body: String,
-    ) {
-        val message = mailSender.createMimeMessage()
-        val helper = MimeMessageHelper(message, false, StandardCharsets.UTF_8.name())
-
-        helper.setFrom(mailFrom)
-        helper.setTo(recipientMailAddress)
-        helper.setSubject(subject)
-        helper.setText(body, true)
-
-        mailSender.send(message)
-    }
 
     @Transactional
     fun createCustomer(
@@ -95,58 +84,17 @@ class AuthService(
             age = signUpRequest.age,
             addressLine = signUpRequest.addressLine,
 
-            lastSignedInAtList = listOf(Instant.now()),
-            lastSignedInDeviceList = signUpRequest.joinedDevice?.let(::listOf) ?: emptyList(),
+            lastSignedInDeviceList = signUpRequest.joinedDevice
+                .copy(lastSignedInAt = Instant.now())
+                .let(::listOf),
+
+            createdAt = Instant.now(),
         )
 
         customerRepository.save(customer)
 
         try {
-            sendEmail(
-                signUpRequest.email,
-                "Welcome to Sharp O\'clock",
-                """
-                <!doctype html>
-                <html>
-                  <head>
-                    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF-8">
-                  </head>
-                  <body style=3D"font-family: sans-serif;">
-                Dear <b>${signUpRequest.fullName}</b>,
-                <br/>
-                Welcome to our shop! Enjoy your stay.
-                <br/>
-                The below block is information regarding your account:
-                <br/>
-                <ul>
-                <li>Full name: ${customer.fullName}</li>
-                <li>Pseudo: ${customer.pseudo}</li>
-                <li>Email: ${customer.email}</li>
-                <li>Address: ${customer.addressLine}</li>
-                <li>Age: ${customer.age}</li>
-                <li>Last connected at: ${
-                    customer.lastSignedInAtList.joinToString(", ") {
-                        SimpleDateFormat(
-                            "dd/MM/yyyy @HH:mm a",
-                            Locale.getDefault()
-                        ).format(Date.from(it))
-                    }
-                }</li>
-                <li>Last joined from: ${
-                    customer.lastSignedInDeviceList.joinToString(", ") {
-                        it.toString()
-                    }
-                }
-                </li>
-                </ul>
-                <br/>
-                Best Regards,
-                <br/>
-                <i>Sharp O'Clock Dev Team.</i>.
-                </body>
-                </html>
-            """.trimIndent()
-            )
+            emailService.sendWelcomeEmail(customer)
         } catch (e: MailSendException) {
             return ResponseEntity(
                 "Could not send a welcome e-mail to ${customer.id}/${customer.email}: ${e.message}",
@@ -164,10 +112,7 @@ class AuthService(
     fun signIn(
         signInRequest: AuthController.SignInRequest
     ): ResponseEntity<*> {
-        val device = signInRequest.lastSignedInDevice ?: return ResponseEntity(
-            "Device parameters are required",
-            HttpStatus.BAD_REQUEST
-        )
+        val device = signInRequest.lastSignedInDevice
         if (device.deviceId.isBlank()) return ResponseEntity(
             "Device id must be attached",
             HttpStatus.BAD_REQUEST
@@ -186,6 +131,13 @@ class AuthService(
 
         val refreshExpiresAt =
             Instant.now().plusSeconds(refreshTokenExpirySeconds)
+
+        customer.lastSignedInDeviceList = customer.lastSignedInDeviceList.toMutableList().apply {
+            addFirst(
+                device.copy(lastSignedInAt = Instant.now())
+            )
+        }
+        customerRepository.save(customer)
 
         return ResponseEntity(
             issueTokenPair(
@@ -207,8 +159,7 @@ class AuthService(
             ?: return invalidRefreshToken()
 
         val storedToken =
-            refreshTokenRepository.findByIdForUpdate(parsedToken.id)
-                ?: return invalidRefreshToken()
+            refreshTokenRepository.findById(parsedToken.id).orElse(null) ?: return invalidRefreshToken()
 
         if (tokenHashMatches(storedToken.tokenHash, parsedToken.secret)) {
             refreshTokenRepository.revokeSession(
@@ -231,8 +182,7 @@ class AuthService(
             ?: return invalidRefreshToken()
 
         val storedToken =
-            refreshTokenRepository.findByIdForUpdate(parsedToken.id)
-                ?: return invalidRefreshToken()
+            refreshTokenRepository.findById(parsedToken.id).orElse(null) ?: return invalidRefreshToken()
 
         if (!tokenHashMatches(storedToken.tokenHash, parsedToken.secret)) {
             return invalidRefreshToken()
@@ -288,11 +238,118 @@ class AuthService(
         )
     }
 
-    fun resetPassword(
-        resetPasswordRequest: AuthController.ResetPasswordRequest
+    @Transactional
+    fun requestPasswordReset(
+        passwordResetRequest: AuthController.PasswordResetRequest
     ): ResponseEntity<*> {
-        //TODO
-        return ResponseEntity.ok().body("placeholder")
+        val identifier = passwordResetRequest.identifier.trim()
+        val genericResponse = ResponseEntity(
+            "If the account exists, a verification code has been sent.",
+            HttpStatus.ACCEPTED
+        )
+        val customer = customerRepository.findByEmailOrPseudo(identifier, identifier) ?: return genericResponse
+
+        val now = Instant.now()
+
+        val existingPasswordResetChallenge = passwordResetChallengeRepository.findByCustomerId(customer.id)
+
+        if (
+            existingPasswordResetChallenge != null &&
+            existingPasswordResetChallenge.otpSentAt.plusSeconds(otpResendCooldownSeconds).isAfter(now)
+        )
+            return genericResponse
+
+        val otp = secureRandom
+            .nextInt(1_000_000)
+            .toString()
+            .padStart(6, '0')
+
+        val passwordResetChallenge = existingPasswordResetChallenge ?: PasswordResetChallenge(
+            id = UUID.randomUUID(),
+            otpHash = passwordEncoder.encode(otp) ?: throw EncodingException("Exception during OTP encoding"),
+            otpExpiryAt = now.plusSeconds(otpExpirySeconds),
+            otpSentAt = now,
+            otpFailedAttempts = 0,
+            customerId = customer.id
+        )
+
+        passwordResetChallengeRepository.save(passwordResetChallenge)
+
+        try {
+            emailService.sendPasswordResetRequestEmail(
+                customer = customer,
+                otp = otp,
+                expiryMinutes = otpExpirySeconds / 60,
+            )
+        } catch (e: MailException) {
+            passwordResetChallengeRepository.delete(passwordResetChallenge)
+
+            println("MailException: ${e.localizedMessage}")
+        }
+
+        return genericResponse
+    }
+
+    @Transactional
+    fun confirmPasswordReset(
+        confirmPasswordResetRequest: AuthController.PasswordResetConfirmRequest
+    ): ResponseEntity<*> {
+        val identifier = confirmPasswordResetRequest.identifier.trim()
+        val invalidResetCodeResponse = ResponseEntity(
+            "Invalid or expired verification code",
+            HttpStatus.NOT_ACCEPTABLE
+        )
+
+        if (identifier.isBlank() || !confirmPasswordResetRequest.otp.matches(Regex("\\d{6}")))
+            return invalidResetCodeResponse
+
+        val customer = customerRepository.findByEmailOrPseudo(identifier, identifier) ?: return invalidResetCodeResponse
+        val customerPasswordResetChallenge =
+            passwordResetChallengeRepository.findByCustomerId(customer.id) ?: return invalidResetCodeResponse
+        val now = Instant.now()
+
+        if (
+            !customerPasswordResetChallenge.otpExpiryAt.isAfter(now) &&
+            customerPasswordResetChallenge.otpFailedAttempts >= otpMaxAttempts
+        ) {
+            passwordResetChallengeRepository.delete(customerPasswordResetChallenge)
+            return invalidResetCodeResponse
+        }
+
+        if (!passwordEncoder.matches(confirmPasswordResetRequest.otp, customerPasswordResetChallenge.otpHash)) {
+            customerPasswordResetChallenge.otpFailedAttempts++
+
+            if (customerPasswordResetChallenge.otpFailedAttempts >= otpMaxAttempts) passwordResetChallengeRepository.delete(
+                customerPasswordResetChallenge
+            )
+            else passwordResetChallengeRepository.save(customerPasswordResetChallenge)
+
+            return invalidResetCodeResponse
+        }
+
+        customer.password = passwordEncoder.encode(confirmPasswordResetRequest.newPassword)
+            ?: throw EncodingException("Exception during newPassword Encoding")
+        customerRepository.save(customer)
+
+        refreshTokenRepository.revokeSessionsForCustomer(
+            customerId = customer.id,
+            revokedAt = now,
+        )
+
+        passwordResetChallengeRepository.delete(customerPasswordResetChallenge)
+
+        try {
+            emailService.sendPasswordResetConfirmEmail(
+                customer = customer
+            )
+        } catch (e: MailException) {
+            println("MailException: ${e.localizedMessage}")
+        }
+
+        return ResponseEntity(
+            "Password changed successfully!",
+            HttpStatus.OK
+        )
     }
 
     private fun invalidRefreshToken(): ResponseEntity<*> =

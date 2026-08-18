@@ -7,26 +7,21 @@ import org.springframework.data.jpa.repository.Lock
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import org.springframework.stereotype.Repository
 import java.time.Instant
+import java.util.Optional
 import java.util.UUID
 
+@Repository
 interface RefreshTokenRepository: JpaRepository<RefreshToken, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(
-        """
-        SELECT token
-        FROM RefreshToken token
-        WHERE token.id = :id
-        """
-    )
-    fun findByIdForUpdate(
+    override fun findById(
         @Param("id") id: UUID,
-    ): RefreshToken?
+    ): Optional<RefreshToken>
 
     @Modifying(
-        flushAutomatically = true,
-        clearAutomatically = true,
+        flushAutomatically = true
     )
     @Query(
         """
@@ -42,8 +37,7 @@ interface RefreshTokenRepository: JpaRepository<RefreshToken, UUID> {
     ): Int
 
     @Modifying(
-        flushAutomatically = true,
-        clearAutomatically = true,
+        flushAutomatically = true
     )
     @Query(
         """
@@ -57,6 +51,22 @@ interface RefreshTokenRepository: JpaRepository<RefreshToken, UUID> {
     fun revokeSessionsForDevice(
         @Param("customerId") customerId: UUID,
         @Param("deviceId") deviceId: String,
+        @Param("revokedAt") revokedAt: Instant,
+    ): Int
+
+    @Modifying(
+        flushAutomatically = true
+    )
+    @Query(
+        """
+            UPDATE RefreshToken token
+            SET token.revokedAt = :revokedAt
+            WHERE token.customerId = :customerId
+                AND token.revokedAt IS NULL
+        """
+    )
+    fun revokeSessionsForCustomer(
+        @Param("customerId") customerId: UUID,
         @Param("revokedAt") revokedAt: Instant,
     ): Int
 }
