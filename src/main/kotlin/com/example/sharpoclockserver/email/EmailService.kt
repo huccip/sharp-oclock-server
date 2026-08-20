@@ -20,7 +20,7 @@ class EmailService(
     private val mailFrom: String
 ) {
     private val dateTimeFormatter = DateTimeFormatter
-        .ofPattern("dd.MM.yyyy 'at' HH:mm a")
+        .ofPattern("dd.MM.yyyy 'at' hh:mm a")
         .withZone(ZoneId.systemDefault())
 
     fun sendWelcomeEmail(
