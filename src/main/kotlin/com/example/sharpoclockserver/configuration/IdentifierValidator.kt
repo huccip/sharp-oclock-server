@@ -3,6 +3,8 @@ package com.example.sharpoclockserver.configuration
 import jakarta.validation.Constraint
 import jakarta.validation.ConstraintValidator
 import jakarta.validation.ConstraintValidatorContext
+import jakarta.validation.Payload
+import kotlin.reflect.KClass
 
 @Target(
     AnnotationTarget.FIELD,
@@ -14,7 +16,11 @@ import jakarta.validation.ConstraintValidatorContext
 @Constraint(
     validatedBy = [IdentifierValidator::class]
 )
-annotation class Identifier()
+annotation class Identifier(
+    val message: String = "Identifier must be a valid email or username",
+    val groups: Array<KClass<*>> = [],
+    val payload: Array<KClass<out Payload>> = []
+)
 
 class IdentifierValidator : ConstraintValidator<Identifier, String> {
     private val emailRegex = Regex("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
