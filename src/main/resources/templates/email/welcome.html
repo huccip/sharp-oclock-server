@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+</head>
+<body style="font-family: sans-serif">
+<p>
+    Dear <strong th:text="${fullName}">Customer</strong>,
+</p>
+
+<p>Welcome to Sharp O'Clock!</p>
+
+<h3>Your account</h3>
+
+<ul>
+    <li>
+        Pseudo: <span th:text="${pseudo}"></span>
+    </li>
+    <li>
+        Email: <span th:text="${email}"></span>
+    </li>
+    <li>
+        Address: <span th:text="${address}"></span>
+    </li>
+    <li>
+        Age: <span th:text="${age}"></span>
+    </li>
+</ul>
+
+<h3>Recent connections</h3>
+
+<ul>
+    <li th:each="date : ${signInDates}" th:text="${date}"></li>
+</ul>
+
+<h3>Registered devices</h3>
+
+<ul>
+    <li th:each="device : ${devices}">
+        <strong th:text="${device.name}">Device name</strong>
+        (<span th:text="${device.type}">Device type</span>)
+        signed in at
+        <span th:text="${device.signedInAt}">Date</span>
+    </li>
+</ul>
+
+<p>
+    Best regards,<br>
+    <i>Sharp O'Clock Dev Team</i>
+</p>
+</body>
+</html>
