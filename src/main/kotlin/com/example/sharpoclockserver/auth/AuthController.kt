@@ -4,6 +4,8 @@ import com.example.sharpoclockserver.configuration.Identifier
 import com.example.sharpoclockserver.model.RegisteredDevice
 import jakarta.validation.Valid
 import jakarta.validation.constraints.*
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -110,8 +112,9 @@ class AuthController(
 
     @PostMapping("/sign-out")
     fun signOut(
+        @AuthenticationPrincipal accessToken: Jwt,
         @RequestBody @Valid signOutRequest: RefreshRequest
-    ) = authService.signOut(signOutRequest)
+    ) = authService.signOut(accessToken, signOutRequest)
 
     @PostMapping("/refresh")
     fun refresh(

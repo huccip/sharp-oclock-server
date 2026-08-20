@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.*
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
@@ -48,6 +49,8 @@ class SecurityConfig {
         audience: String,
         @Value($$"${app.jwt.client-id}")
         clientId: String,
+
+        revokedAccessTokenStore: RevokedAccessTokenStore
     ): JwtDecoder {
 
         val decoder = NimbusJwtDecoder
@@ -57,11 +60,14 @@ class SecurityConfig {
             .build()
 
         decoder.setJwtValidator(
-            JwtValidators.createAtJwtValidator()
-                .issuer(issuer)
-                .audience(audience)
-                .clientId(clientId)
-                .build()
+            DelegatingOAuth2TokenValidator(
+                JwtValidators.createAtJwtValidator()
+                    .issuer(issuer)
+                    .audience(audience)
+                    .clientId(clientId)
+                    .build(),
+                RevokedJwtValidator(revokedAccessTokenStore)
+            )
         )
 
         return decoder

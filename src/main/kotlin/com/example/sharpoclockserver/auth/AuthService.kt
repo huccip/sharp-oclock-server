@@ -1,5 +1,6 @@
 package com.example.sharpoclockserver.auth
 
+import com.example.sharpoclockserver.configuration.RevokedAccessTokenStore
 import com.example.sharpoclockserver.email.EmailService
 import com.example.sharpoclockserver.model.Customer
 import com.example.sharpoclockserver.model.PasswordResetChallenge
@@ -16,14 +17,12 @@ import org.springframework.mail.MailException
 import org.springframework.mail.MailSendException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
-import org.springframework.security.oauth2.jwt.JwsHeader
-import org.springframework.security.oauth2.jwt.JwtClaimsSet
-import org.springframework.security.oauth2.jwt.JwtEncoder
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters
+import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.security.SecureRandom
+import java.time.Duration
 import java.time.Instant
 import java.util.*
 
@@ -54,6 +53,8 @@ class AuthService(
     private val otpMaxAttempts: Int,
 
     private val emailService: EmailService,
+
+    private val revokedAccessTokenStore: RevokedAccessTokenStore
 ) {
 
     private val secureRandom = SecureRandom()
@@ -153,8 +154,20 @@ class AuthService(
 
     @Transactional
     fun signOut(
+        accessToken: Jwt,
         request: AuthController.RefreshRequest,
     ): ResponseEntity<*> {
+        if (accessToken.id == null) return ResponseEntity(
+            "Invalid access token",
+            HttpStatus.BAD_REQUEST
+        )
+
+        val accessTokenTtl = Duration.between(Instant.now(), accessToken.expiresAt)
+        revokedAccessTokenStore.revoke(
+            accessToken.id!!,
+            accessTokenTtl
+        )
+
         val parsedToken = parseRefreshToken(request.refreshToken)
             ?: return invalidRefreshToken()
 
