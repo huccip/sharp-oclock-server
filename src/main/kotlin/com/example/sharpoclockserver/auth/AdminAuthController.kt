@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 class AdminAuthController {
 
     @GetMapping("/sign-in")
-    fun signIn() = "auth/admin/sign-in"
+    fun signInTemplate() = "admin/auth/sign-in"
 
     @GetMapping("/dashboard")
-    fun dashboard() = "auth/admin/dashboard"
+    fun dashboardTemplate() = "admin/auth/dashboard"
 }

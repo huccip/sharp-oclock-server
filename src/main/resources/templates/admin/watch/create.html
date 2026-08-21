@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Add Watch</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page">
+<main class="admin-panel">
+    <header class="admin-header">
+        <div>
+            <p class="admin-subtitle">Catalog management</p>
+            <h1 class="admin-title">Add New Watch</h1>
+        </div>
+        <a class="admin-link" th:href="@{/admin/watches/list}">Back to Watches</a>
+    </header>
+
+    <section class="ai-panel">
+        <label class="ai-panel-title" for="aiKeywords">AI Auto-Fill Assistant</label>
+        <div class="ai-controls">
+            <input class="form-control ai-input" id="aiKeywords"
+                   placeholder="Example: Fossil 42mm black dial leather chronograph"
+                   type="text">
+            <button class="btn btn-primary btn-small" disabled id="generateAiBtn" type="button">
+                Generate Details
+            </button>
+        </div>
+    </section>
+
+    <form class="admin-form" id="createWatchForm" method="post" th:action="@{/admin/watches/save}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="brand">Brand</label>
+                <input class="form-control" id="brand" name="brand" required type="text">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="name">Watch Name</label>
+                <input class="form-control" id="name" name="name" required type="text">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="priceDisplay">Price ($USD)</label>
+                <input class="form-control" id="priceDisplay" max="1000000" min="40" name="priceDisplay" placeholder="199.99"
+                       required step="0.01" type="number">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="sizes">Available Sizes (Comma Separated)</label>
+                <input class="form-control" id="sizes" name="sizes" placeholder="38mm, 40mm, 42mm" required
+                       type="text">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="thumbnailUrl">Thumbnail URL (R2)</label>
+                <input class="form-control" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://pub-r2.com/watches/thumb_123.webp"
+                       required type="url">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="imageUrl">Hero Image URL (R2)</label>
+                <input class="form-control" id="imageUrl" name="imageUrl" placeholder="https://pub-r2.com/watches/hero_123.webp"
+                       required type="url">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control form-textarea" id="description" name="description" required></textarea>
+        </div>
+
+        <div class="checkbox-panel">
+            <input name="_isNew" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" name="isNew" type="checkbox" value="true">
+                Mark as New
+            </label>
+
+            <input name="_isDiscounted" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" name="isDiscounted" type="checkbox" value="true">
+                Is Discounted
+            </label>
+
+            <input name="_isOOS" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" name="isOOS" type="checkbox" value="true">
+                Out of Stock
+            </label>
+        </div>
+
+        <p class="form-note">Units sold and popular status are calculated by backend business rules.</p>
+
+        <button class="btn btn-primary btn-full" disabled id="saveWatchBtn" type="submit">
+            Save Watch to Database
+        </button>
+    </form>
+</main>
+
+<script>
+    const generateBtn = document.getElementById('generateAiBtn');
+    const keywordsInput = document.getElementById('aiKeywords');
+    const createWatchForm = document.getElementById('createWatchForm');
+    const saveWatchBtn = document.getElementById('saveWatchBtn');
+
+    const updateGenerateButton = () => {
+        generateBtn.disabled = keywordsInput.value.trim() === '';
+    };
+
+    const updateSaveButton = () => {
+        saveWatchBtn.disabled = !createWatchForm.checkValidity();
+    };
+
+    keywordsInput.addEventListener('input', updateGenerateButton);
+    createWatchForm.addEventListener('input', updateSaveButton);
+    createWatchForm.addEventListener('change', updateSaveButton);
+
+    createWatchForm.addEventListener('submit', () => {
+        saveWatchBtn.disabled = true;
+        saveWatchBtn.textContent = 'Saving Watch...';
+    });
+
+    generateBtn.addEventListener('click', async () => {
+        const prompt = keywordsInput.value.trim();
+        if (!prompt) {
+            alert('Please type a few words into the AI prompt field first.');
+            return;
+        }
+
+        const originalBtnText = generateBtn.textContent;
+        generateBtn.textContent = 'Generating...';
+        generateBtn.disabled = true;
+
+        try {
+            const response = await fetch(`/admin/watches/generate-details?prompt=${encodeURIComponent(prompt)}`);
+            if (!response.ok) throw new Error('Generation failed');
+
+            const data = await response.json();
+            if (data.brand) document.getElementById('brand').value = data.brand;
+            if (data.name) document.getElementById('name').value = data.name;
+            if (data.description) document.getElementById('description').value = data.description;
+            updateSaveButton();
+        } catch (error) {
+            console.error(error);
+            alert('Failed to generate details. Please check server logs.');
+        } finally {
+            generateBtn.textContent = originalBtnText;
+            updateGenerateButton();
+        }
+    });
+
+    updateGenerateButton();
+    updateSaveButton();
+</script>
+</body>
+</html>

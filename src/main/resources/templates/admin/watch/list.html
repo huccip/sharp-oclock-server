@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Watches</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page">
+<main class="admin-panel admin-panel-wide">
+    <header class="admin-header">
+        <div>
+            <p class="admin-subtitle">Catalog management</p>
+            <h1 class="admin-title">
+                Watches
+                <span class="admin-subtitle" th:text="'(' + ${#lists.size(watches)} + ')'">(0)</span>
+            </h1>
+        </div>
+        <a class="btn btn-primary btn-small" th:href="@{/admin/watches/create}">Add Watch</a>
+    </header>
+
+    <section class="empty-state" th:if="${#lists.isEmpty(watches)}">
+        No watches yet.
+        <a class="admin-link-accent" th:href="@{/admin/watches/create}">Create your first one.</a>
+    </section>
+
+    <section class="table-shell" th:unless="${#lists.isEmpty(watches)}">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Thumb</th>
+                <th>Brand</th>
+                <th>Name</th>
+                <th class="table-number">Price</th>
+                <th>Sizes</th>
+                <th class="table-number">Sold</th>
+                <th>Flags</th>
+                <th class="table-actions">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="watch : ${watches}">
+                <td>
+                    <img class="watch-thumbnail" th:alt="${watch.name}" th:src="${watch.thumbnailUrl}">
+                </td>
+                <td th:text="${watch.brand}">Brand</td>
+                <td th:text="${watch.name}">Watch name</td>
+                <td class="table-number"
+                    th:text="'$' + ${#numbers.formatDecimal(watch.price / 100.0, 1, 2)}">$0.00
+                </td>
+                <td class="table-muted" th:text="${#strings.listJoin(watch.sizes, ', ')}">40mm</td>
+                <td class="table-number table-muted" th:text="${watch.unitsSold}">0</td>
+                <td>
+                    <div class="badge-list">
+                        <span class="badge badge-new" th:if="${watch.isNew == true}">NEW</span>
+                        <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">SALE</span>
+                        <span class="badge badge-danger" th:if="${watch.isOOS == true}">OOS</span>
+                        <span class="badge badge-popular" th:if="${watch.isPopular == true}">POPULAR</span>
+                    </div>
+                </td>
+                <td class="table-actions">
+                    <a class="action-link action-details"
+                       th:href="@{/admin/watches/details/{watchId}(watchId=${watch.id})}">Details</a>
+                    <a class="action-link action-edit"
+                       th:href="@{/admin/watches/edit/{watchId}(watchId=${watch.id})}">Edit</a>
+                    <form class="inline-form"
+                          method="post" onsubmit="return confirm('Delete this watch?')"
+                          th:action="@{/admin/watches/delete/{watchId}(watchId=${watch.id})}">
+                        <button class="action-link action-delete" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <p class="form-note">Prices are displayed in USD and stored as cents.</p>
+</main>
+</body>
+</html>

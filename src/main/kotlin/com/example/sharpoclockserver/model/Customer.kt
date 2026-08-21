@@ -22,6 +22,7 @@ data class Customer(
 
     @Column(name = "phone_number", unique = true)
     val phoneNumber: String? = null,
+    val city: String? = null,
     @Column(name = "address_line")
     val addressLine: String? = null,
     /** will be used for the recommendation system (AI recommends articles (watches) depending on customer age) */

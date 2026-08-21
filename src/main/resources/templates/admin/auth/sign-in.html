@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Sign In</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page admin-page-centered">
+<main class="admin-panel admin-panel-compact">
+    <header class="auth-brand">
+        <p class="auth-brand-mark">Sharp O'Clock</p>
+        <h1 class="auth-title">Admin sign in</h1>
+        <p class="auth-subtitle">Manage the watch catalog and storefront.</p>
+    </header>
+
+    <p class="notice notice-error" th:if="${param.error}">Invalid credentials.</p>
+    <p class="notice notice-success" th:if="${param['sign-out']}">You have signed out.</p>
+    <p class="notice notice-warning" th:if="${param.expired}">Your session expired. Sign in again.</p>
+
+    <form class="admin-form" method="post" th:action="@{/admin/sign-in}">
+        <div class="form-group">
+            <label class="form-label" for="identifier">Admin identifier</label>
+            <input autocomplete="username" class="form-control" id="identifier" name="identifier" placeholder="Enter the admin identifier"
+                   required type="text">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input autocomplete="current-password" class="form-control" id="password" name="password" placeholder="Enter the admin password"
+                   required type="password">
+        </div>
+
+        <button class="btn btn-primary btn-full" type="submit">Sign in</button>
+    </form>
+</main>
+</body>
+</html>
