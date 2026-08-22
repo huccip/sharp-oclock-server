@@ -4,6 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.Instant
 import java.util.*
 
 @Entity
@@ -37,4 +38,9 @@ data class Watch(
     var isNew: Boolean? = null,
     @Column(name = "is_popular")
     var isPopular: Boolean? = null, // true if units sold > 20 and the median of reviews >= 4.0
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    val createdAt: Instant = Instant.now(),
+    @Column(name = "last_edited_at", updatable = true)
+    val lastEditedAt: Instant? = null
 )

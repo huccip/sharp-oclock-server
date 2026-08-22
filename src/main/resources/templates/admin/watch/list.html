@@ -13,17 +13,27 @@
             <p class="admin-subtitle">Catalog management</p>
             <h1 class="admin-title">
                 Watches
-                <span class="admin-subtitle" th:text="'(' + ${#lists.size(watches)} + ')'">(0)</span>
+                <span class="admin-subtitle" id="watchCount" th:text="'(' + ${#lists.size(watches)} + ')'">(0)</span>
             </h1>
         </div>
         <a class="btn btn-primary btn-small" th:href="@{/admin/watches/create}">Add Watch</a>
     </header>
 
+    <div class="form-group" style="margin-bottom: 8px">
+        <label class="form-label" for="search">Search for a watch</label>
+        <input class="form-control"
+               id="search"
+               placeholder="Search by name or description or brand..."
+               type="search"/>
+    </div>
+
     <section class="empty-state" th:if="${#lists.isEmpty(watches)}">
         No watches yet.
         <a class="admin-link-accent" th:href="@{/admin/watches/create}">Create your first one.</a>
     </section>
-
+    <section class="empty-state" hidden id="noSearchResults">
+        No watches match your search.
+    </section>
     <section class="table-shell" th:unless="${#lists.isEmpty(watches)}">
         <table class="admin-table">
             <thead>
@@ -39,7 +49,10 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="watch : ${watches}">
+            <tr data-watch-row
+                th:attr="data-search=${watch.name + ' ' + watch.description + ' ' + watch.brand}"
+                th:each="watch : ${watches}"
+            >
                 <td>
                     <img class="watch-thumbnail" th:alt="${watch.name}" th:src="${watch.thumbnailUrl}">
                 </td>
@@ -76,5 +89,43 @@
 
     <p class="form-note">Prices are displayed in USD and stored as cents.</p>
 </main>
+
+<script>
+    const searchInput = document.querySelector('#search');
+    const watchRows = Array.from(
+        document.querySelectorAll('[data-watch-row]')
+    );
+    const watchCount = document.querySelector("#watchCount");
+    const noSearchResults = document.querySelector("#noSearchResults");
+
+    function filterWatches() {
+        const searchTerms = searchInput.value
+            .trim()
+            .toLowerCase()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        let visibleCount = 0;
+
+        watchRows.forEach((row) => {
+            const searchableText = row.dataset.search.toLowerCase();
+
+            const matches = searchTerms.every(term => searchableText.includes(term));
+
+            row.hidden = !matches;
+
+            if (matches) visibleCount++;
+        })
+
+        watchCount.textContent = `(${visibleCount})`;
+        noSearchResults.hidden = searchTerms.length === 0 || visibleCount > 0;
+    }
+
+    searchInput.addEventListener(
+        'input',
+        filterWatches,
+    )
+</script>
+
 </body>
 </html>

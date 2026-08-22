@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.Instant
 import java.util.*
 
 @Service
@@ -41,7 +42,9 @@ class WatchService(
             isOOS = saveWatchRequest.isOOS,
             isDiscounted = saveWatchRequest.isDiscounted,
             isNew = saveWatchRequest.isNew,
-            isPopular = false
+            isPopular = false,
+
+            createdAt = Instant.now(),
         )
 
         watchRepository.save(newWatch)
@@ -71,6 +74,8 @@ class WatchService(
             isOOS = editWatchRequest.isOOS,
             isDiscounted = editWatchRequest.isDiscounted,
             isNew = editWatchRequest.isNew,
+
+            lastEditedAt = Instant.now()
         )
 
         watchRepository.save(editedWatch)
