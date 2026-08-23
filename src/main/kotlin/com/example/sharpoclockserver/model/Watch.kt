@@ -14,9 +14,13 @@ data class Watch(
     @Column(columnDefinition = "uuid", nullable = false, updatable = false, unique = true)
     val id: UUID,
     @Column(name = "thumbnail_url", length = 1024, nullable = false)
-    var thumbnailUrl: String, // path to the small image (is stored in Object Storage Cloudflare R2 and is displayed in plp)
-    @Column(name = "image_url", length = 1024, nullable = false)
-    var imageUrl: String, // path to the big image (is stored in Object Storage Cloudflare R2 and is displayed in pdp)
+    var thumbnailUrl: String,
+    @Column(name = "thumbnail_public_id", nullable = false)
+    var thumbnailPublicId: String,
+    @Column(name = "hero_url", length = 1024, nullable = false)
+    var heroUrl: String,
+    @Column(name = "hero_public_id", nullable = false)
+    var heroPublicId: String,
     @Column(nullable = false)
     var brand: String,
     @Column(nullable = false)

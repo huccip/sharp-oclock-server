@@ -31,7 +31,7 @@
         No watches yet.
         <a class="admin-link-accent" th:href="@{/admin/watches/create}">Create your first one.</a>
     </section>
-    <section class="empty-state" hidden id="noSearchResults">
+    <section class="empty-state" hidden id="noSearchResults" style="margin-bottom: 8px">
         No watches match your search.
     </section>
     <section class="table-shell" th:unless="${#lists.isEmpty(watches)}">

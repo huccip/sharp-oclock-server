@@ -16,7 +16,7 @@
         <a class="admin-link" th:href="@{/admin/watches/list}">Back to Watches</a>
     </header>
 
-    <form class="admin-form"
+    <form class="admin-form" enctype="multipart/form-data"
           method="post" th:action="@{/admin/watches/update/{watchId}(watchId=${watchId})}">
         <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
 
@@ -46,14 +46,20 @@
 
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label" for="thumbnailUrl">Thumbnail URL (R2)</label>
-                <input class="form-control" id="thumbnailUrl" name="thumbnailUrl"
-                       required th:value="${watch.thumbnailUrl}" type="url">
+                <label class="form-label" for="thumbnailImage">Thumbnail Image (Small)</label>
+                <img class="details-thumbnail" th:alt="${watch.name + ' thumbnail'}"
+                     th:src="${watch.thumbnailUrl}">
+                <input accept="image/png,image/jpeg,image/webp" class="form-control" id="thumbnailImage"
+                       name="thumbnailImage" type="file">
+                <p class="form-note">Leave empty to keep the current thumbnail.</p>
             </div>
             <div class="form-group">
-                <label class="form-label" for="imageUrl">Hero Image URL (R2)</label>
-                <input class="form-control" id="imageUrl" name="imageUrl"
-                       required th:value="${watch.imageUrl}" type="url">
+                <label class="form-label" for="heroImage">Hero Image (Big)</label>
+                <img class="details-thumbnail" th:alt="${watch.name + ' hero image'}"
+                     th:src="${watch.heroUrl}">
+                <input accept="image/png,image/jpeg,image/webp" class="form-control" id="heroImage"
+                       name="heroImage" type="file">
+                <p class="form-note">Leave empty to keep the current hero image.</p>
             </div>
         </div>
 

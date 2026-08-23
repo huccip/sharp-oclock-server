@@ -38,6 +38,7 @@ dependencies {
 	implementation("org.springframework.ai:spring-ai-vector-store-advisor")
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 	implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation("com.cloudinary:cloudinary-http5:2.4.0")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")

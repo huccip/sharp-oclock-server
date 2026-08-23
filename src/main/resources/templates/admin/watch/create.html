@@ -28,7 +28,8 @@
         </div>
     </section>
 
-    <form class="admin-form" id="createWatchForm" method="post" th:action="@{/admin/watches/save}">
+    <form class="admin-form" enctype="multipart/form-data" id="createWatchForm" method="post"
+          th:action="@{/admin/watches/save}">
         <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
 
         <div class="form-grid">
@@ -45,7 +46,8 @@
         <div class="form-grid">
             <div class="form-group">
                 <label class="form-label" for="priceDisplay">Price ($USD)</label>
-                <input class="form-control" id="priceDisplay" max="1000000" min="40" name="priceDisplay" placeholder="199.99"
+                <input class="form-control" id="priceDisplay" max="1000000" min="40" name="priceDisplay"
+                       placeholder="199.99"
                        required step="0.01" type="number">
             </div>
             <div class="form-group">
@@ -57,14 +59,14 @@
 
         <div class="form-grid">
             <div class="form-group">
-                <label class="form-label" for="thumbnailUrl">Thumbnail URL (R2)</label>
-                <input class="form-control" id="thumbnailUrl" name="thumbnailUrl" placeholder="https://pub-r2.com/watches/thumb_123.webp"
-                       required type="url">
+                <label class="form-label" for="thumbnailImage">Thumbnail Image (Small)</label>
+                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="thumbnailImage" name="thumbnailImage" required
+                       type="file">
             </div>
             <div class="form-group">
-                <label class="form-label" for="imageUrl">Hero Image URL (R2)</label>
-                <input class="form-control" id="imageUrl" name="imageUrl" placeholder="https://pub-r2.com/watches/hero_123.webp"
-                       required type="url">
+                <label class="form-label" for="heroImage">Hero Image (Big)</label>
+                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="heroImage" name="heroImage" required
+                       type="file">
             </div>
         </div>
 

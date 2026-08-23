@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
 import java.util.*
 
@@ -27,12 +28,8 @@ class AdminWatchController(
     )
 
     data class SaveWatchRequest(
-        @NotNull
-        @NotBlank
-        var thumbnailUrl: String, // path to the small image (is stored in Object Storage Cloudflare R2 and is displayed in plp)
-        @NotNull
-        @NotBlank
-        var imageUrl: String, // path to the big image (is stored in Object Storage Cloudflare R2 and is displayed in pdp)
+        var thumbnailImage: MultipartFile? = null,
+        var heroImage: MultipartFile? = null,
         @NotNull
         @NotBlank
         var brand: String,
@@ -57,7 +54,7 @@ class AdminWatchController(
 
     data class EditWatchView(
         val thumbnailUrl: String,
-        val imageUrl: String,
+        val heroUrl: String,
         val brand: String,
         val name: String,
         val description: String,
@@ -70,7 +67,7 @@ class AdminWatchController(
 
     data class WatchDetailsView(
         val thumbnailUrl: String,
-        val imageUrl: String,
+        val heroUrl: String,
         val brand: String,
         val name: String,
         val description: String,
