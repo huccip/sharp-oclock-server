@@ -43,6 +43,9 @@ data class Watch(
     @Column(name = "is_popular")
     var isPopular: Boolean? = null, // true if units sold > 20 and the median of reviews >= 4.0
 
+    @Column(name = "discount_percentage")
+    var discountPercentage: Int? = null,
+
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
     @Column(name = "last_edited_at", updatable = true)

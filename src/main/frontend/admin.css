@@ -253,7 +253,7 @@
     }
 
     .details-image-panel {
-        @apply overflow-hidden rounded-xl border border-slate-700 bg-slate-900;
+        @apply relative overflow-hidden rounded-xl border border-slate-700 bg-slate-900;
     }
 
     .details-hero-image {
@@ -274,6 +274,22 @@
 
     .details-price {
         @apply text-3xl font-bold text-amber-400;
+    }
+
+    .details-price-row {
+        @apply flex flex-wrap items-baseline gap-3;
+    }
+
+    .details-price-original {
+        @apply text-lg font-semibold text-slate-500 line-through;
+    }
+
+    .details-price-discounted {
+        @apply text-3xl font-bold text-emerald-400;
+    }
+
+    .details-discount-badge {
+        @apply absolute right-4 top-4 rounded-full border border-red-400/50 bg-red-500 px-3 py-1.5 text-sm font-bold text-white shadow-lg;
     }
 
     .details-meta-grid {

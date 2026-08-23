@@ -30,6 +30,7 @@ class AdminWatchController(
     data class SaveWatchRequest(
         var thumbnailImage: MultipartFile? = null,
         var heroImage: MultipartFile? = null,
+
         @NotNull
         @NotBlank
         var brand: String,
@@ -50,34 +51,60 @@ class AdminWatchController(
         var isOOS: Boolean? = null, // Out Of Stock
         var isDiscounted: Boolean? = null,
         var isNew: Boolean? = null,
+
+        @Min(1)
+        @Max(100)
+        var discountPercentage: Int? = null,
     )
 
     data class EditWatchView(
         val thumbnailUrl: String,
         val heroUrl: String,
-        val brand: String,
-        val name: String,
-        val description: String,
-        val sizes: List<String>,
-        val priceDisplay: BigDecimal,
-        val isOOS: Boolean?,
-        val isDiscounted: Boolean?,
-        val isNew: Boolean?,
+
+        @NotNull
+        @NotBlank
+        var brand: String,
+        @NotNull
+        @NotBlank
+        var name: String,
+        @NotNull
+        @NotBlank
+        var description: String,
+        @NotNull
+        @NotEmpty
+        var sizes: List<String>,
+        @NotNull
+        @Min(40)
+        @Max(1_000_000)
+        var priceDisplay: BigDecimal, // multiply by 100 to store and divide by 100 to retrieve
+
+        var isOOS: Boolean?, // Out Of Stock
+        var isDiscounted: Boolean?,
+        var isNew: Boolean?,
+
+        @Min(1)
+        @Max(100)
+        var discountPercentage: Int?,
     )
 
     data class WatchDetailsView(
         val thumbnailUrl: String,
         val heroUrl: String,
-        val brand: String,
-        val name: String,
-        val description: String,
-        val sizes: List<String>,
-        val priceDisplay: BigDecimal,
+
+        var brand: String,
+        var name: String,
+        var description: String,
+        var sizes: List<String>,
+        var priceDisplay: BigDecimal, // multiply by 100 to store and divide by 100 to retrieve
+        val discountedPriceDisplay: BigDecimal?,
         val unitsSold: Long,
-        val isOOS: Boolean?,
-        val isDiscounted: Boolean?,
-        val isNew: Boolean?,
+
+        var isOOS: Boolean? = null, // Out Of Stock
+        var isDiscounted: Boolean? = null,
+        var isNew: Boolean? = null,
         val isPopular: Boolean?,
+
+        var discountPercentage: Int? = null,
     )
 
     @GetMapping("/create")

@@ -60,12 +60,14 @@
         <div class="form-grid">
             <div class="form-group">
                 <label class="form-label" for="thumbnailImage">Thumbnail Image (Small)</label>
-                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="thumbnailImage" name="thumbnailImage" required
+                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="thumbnailImage"
+                       name="thumbnailImage" required
                        type="file">
             </div>
             <div class="form-group">
                 <label class="form-label" for="heroImage">Hero Image (Big)</label>
-                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="heroImage" name="heroImage" required
+                <input accept="image/png, image/jpeg, image/jpg, image/webp" class="form-control" id="heroImage"
+                       name="heroImage" required
                        type="file">
             </div>
         </div>
@@ -84,7 +86,7 @@
 
             <input name="_isDiscounted" type="hidden" value="on">
             <label class="checkbox-label">
-                <input class="checkbox-control" name="isDiscounted" type="checkbox" value="true">
+                <input class="checkbox-control" id="isDiscounted" name="isDiscounted" type="checkbox" value="true">
                 Is Discounted
             </label>
 
@@ -93,6 +95,12 @@
                 <input class="checkbox-control" name="isOOS" type="checkbox" value="true">
                 Out of Stock
             </label>
+        </div>
+
+        <div class="form-group" hidden id="discountPercentageContainer">
+            <label class="form-label" for="discountPercentage">Discount Percentage</label>
+            <input class="form-control" id="discountPercentage" max="100" min="1" name="discountPercentage"
+                   placeholder="50 (%)" type="number"/>
         </div>
 
         <p class="form-note">Units sold and popular status are calculated by backend business rules.</p>
@@ -104,10 +112,13 @@
 </main>
 
 <script>
-    const generateBtn = document.getElementById('generateAiBtn');
-    const keywordsInput = document.getElementById('aiKeywords');
-    const createWatchForm = document.getElementById('createWatchForm');
-    const saveWatchBtn = document.getElementById('saveWatchBtn');
+    const generateBtn = document.querySelector('#generateAiBtn');
+    const keywordsInput = document.querySelector('#aiKeywords');
+    const createWatchForm = document.querySelector('#createWatchForm');
+    const saveWatchBtn = document.querySelector('#saveWatchBtn');
+    const isDiscountedCheckbox = document.querySelector('#isDiscounted');
+    const discountPercentageContainer = document.querySelector('#discountPercentageContainer');
+    const discountPercentageInput = document.querySelector('#discountPercentage');
 
     const updateGenerateButton = () => {
         generateBtn.disabled = keywordsInput.value.trim() === '';
@@ -117,6 +128,12 @@
         saveWatchBtn.disabled = !createWatchForm.checkValidity();
     };
 
+    isDiscountedCheckbox.addEventListener('change', (e) => {
+        discountPercentageContainer.hidden = !e.target.checked
+        discountPercentageInput.required = e.target.checked
+
+        if (!e.target.checked) discountPercentageInput.value = ''
+    });
     keywordsInput.addEventListener('input', updateGenerateButton);
     createWatchForm.addEventListener('input', updateSaveButton);
     createWatchForm.addEventListener('change', updateSaveButton);

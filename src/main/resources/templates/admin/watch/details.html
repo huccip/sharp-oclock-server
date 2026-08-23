@@ -19,12 +19,21 @@
     <section class="details-grid">
         <div class="details-image-panel">
             <img class="details-hero-image" th:alt="${watch.name}" th:src="${watch.heroUrl}">
+            <span class="details-discount-badge"
+                  th:if="${watch.isDiscounted == true and watch.discountPercentage != null}"
+                  th:text="|${watch.discountPercentage}% OFF|">20% OFF</span>
         </div>
 
         <div class="details-content">
             <div>
                 <p class="details-label">Price</p>
-                <p class="details-price"
+                <div class="details-price-row" th:if="${watch.discountedPriceDisplay != null}">
+                    <p class="details-price-original"
+                       th:text="'$' + ${#numbers.formatDecimal(watch.priceDisplay, 1, 2)}">$0.00</p>
+                    <p class="details-price-discounted"
+                       th:text="'$' + ${#numbers.formatDecimal(watch.discountedPriceDisplay, 1, 2)}">$0.00</p>
+                </div>
+                <p class="details-price" th:if="${watch.discountedPriceDisplay == null}"
                    th:text="'$' + ${#numbers.formatDecimal(watch.priceDisplay, 1, 2)}">$0.00</p>
             </div>
 
@@ -32,7 +41,10 @@
                 <p class="details-label">Status</p>
                 <div class="badge-list">
                     <span class="badge badge-new" th:if="${watch.isNew == true}">NEW</span>
-                    <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">SALE</span>
+                    <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">
+                        SALE<span th:if="${watch.discountPercentage != null}"
+                                  th:text="| - ${watch.discountPercentage}%|"></span>
+                    </span>
                     <span class="badge badge-danger" th:if="${watch.isOOS == true}">OUT OF STOCK</span>
                     <span class="badge badge-popular" th:if="${watch.isPopular == true}">POPULAR</span>
                     <span class="badge badge-standard"

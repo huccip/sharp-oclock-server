@@ -79,7 +79,8 @@
 
             <input name="_isDiscounted" type="hidden" value="on">
             <label class="checkbox-label">
-                <input class="checkbox-control" name="isDiscounted" th:checked="${watch.isDiscounted == true}"
+                <input class="checkbox-control" id="isDiscounted" name="isDiscounted"
+                       th:checked="${watch.isDiscounted == true}"
                        type="checkbox" value="true">
                 Is Discounted
             </label>
@@ -92,6 +93,25 @@
             </label>
         </div>
 
+        <div class="form-group"
+             id="discountPercentageContainer"
+             th:hidden="${watch.isDiscounted != true}">
+
+            <label class="form-label" for="discountPercentage">
+                Discount Percentage
+            </label>
+
+            <input class="form-control"
+                   id="discountPercentage"
+                   max="100"
+                   min="1"
+                   name="discountPercentage"
+                   placeholder="50 (%)"
+                   th:required="${watch.isDiscounted == true}"
+                   th:value="${watch.discountPercentage}"
+                   type="number">
+        </div>
+
         <p class="form-note">Units sold and popular status are preserved and cannot be edited here.</p>
 
         <div class="button-row">
@@ -100,5 +120,19 @@
         </div>
     </form>
 </main>
+
+<script>
+    const isDiscountedCheckbox = document.querySelector('#isDiscounted');
+    const discountPercentageContainer = document.querySelector('#discountPercentageContainer');
+    const discountPercentageInput = document.querySelector('#discountPercentage');
+
+    isDiscountedCheckbox.addEventListener('change', (e) => {
+        discountPercentageContainer.hidden = !e.target.checked
+        discountPercentageInput.required = e.target.checked
+
+        if (!e.target.checked) discountPercentageInput.value = ''
+    });
+</script>
+
 </body>
 </html>

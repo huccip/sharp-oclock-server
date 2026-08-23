@@ -19,7 +19,7 @@
         <a class="btn btn-primary btn-small" th:href="@{/admin/watches/create}">Add Watch</a>
     </header>
 
-    <div class="form-group" style="margin-bottom: 8px">
+    <div class="form-group" style="margin-bottom: 8px" th:unless="${#lists.isEmpty(watches)}">
         <label class="form-label" for="search">Search for a watch</label>
         <input class="form-control"
                id="search"
@@ -66,7 +66,9 @@
                 <td>
                     <div class="badge-list">
                         <span class="badge badge-new" th:if="${watch.isNew == true}">NEW</span>
-                        <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">SALE</span>
+                        <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">
+                            SALE<span th:text="| - ${watch.discountPercentage}%|"></span>
+                        </span>
                         <span class="badge badge-danger" th:if="${watch.isOOS == true}">OOS</span>
                         <span class="badge badge-popular" th:if="${watch.isPopular == true}">POPULAR</span>
                     </div>

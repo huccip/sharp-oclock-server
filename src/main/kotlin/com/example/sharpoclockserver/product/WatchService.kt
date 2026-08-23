@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.util.*
 
@@ -80,20 +81,26 @@ class WatchService(
 
         val newWatch = Watch(
             id = UUID.randomUUID(),
+
             thumbnailUrl = uploadedThumbnail.url,
             thumbnailPublicId = uploadedThumbnail.publicId,
             heroUrl = uploadedHero.url,
             heroPublicId = uploadedHero.publicId,
+
             brand = saveWatchRequest.brand,
             name = saveWatchRequest.name,
             description = saveWatchRequest.description,
             sizes = saveWatchRequest.sizes,
             price = saveWatchRequest.priceDisplay.multiply(BigDecimal(100)).toInt(),
             unitsSold = 0L,
+
             isOOS = saveWatchRequest.isOOS,
             isDiscounted = saveWatchRequest.isDiscounted,
             isNew = saveWatchRequest.isNew,
             isPopular = false,
+
+            discountPercentage = saveWatchRequest.discountPercentage
+                .takeIf { saveWatchRequest.isDiscounted == true },
 
             createdAt = Instant.now(),
         )
@@ -127,14 +134,19 @@ class WatchService(
             thumbnailPublicId = uploadedThumbnail?.publicId ?: watchToEdit.thumbnailPublicId,
             heroUrl = uploadedHero?.url ?: watchToEdit.heroUrl,
             heroPublicId = uploadedHero?.publicId ?: watchToEdit.heroPublicId,
+
             brand = editWatchRequest.brand,
             name = editWatchRequest.name,
             description = editWatchRequest.description,
             sizes = editWatchRequest.sizes,
             price = editWatchRequest.priceDisplay.multiply(BigDecimal(100)).toInt(),
+
             isOOS = editWatchRequest.isOOS,
             isDiscounted = editWatchRequest.isDiscounted,
             isNew = editWatchRequest.isNew,
+
+            discountPercentage = editWatchRequest.discountPercentage
+                .takeIf { editWatchRequest.isDiscounted == true },
 
             lastEditedAt = Instant.now()
         )
@@ -161,14 +173,18 @@ class WatchService(
         return AdminWatchController.EditWatchView(
             thumbnailUrl = watch.thumbnailUrl,
             heroUrl = watch.heroUrl,
+
             brand = watch.brand,
             name = watch.name,
             description = watch.description,
             sizes = watch.sizes,
             priceDisplay = BigDecimal.valueOf(watch.price.toLong(), 2),
+
             isOOS = watch.isOOS,
             isDiscounted = watch.isDiscounted,
             isNew = watch.isNew,
+
+            discountPercentage = watch.discountPercentage,
         )
     }
 
@@ -176,20 +192,34 @@ class WatchService(
         watchId: UUID,
     ): AdminWatchController.WatchDetailsView {
         val watch = getWatchById(watchId)
+        val priceDisplay = BigDecimal.valueOf(watch.price.toLong(), 2)
+        val discountedPriceDisplay = watch.discountPercentage
+            ?.takeIf { watch.isDiscounted == true }
+            ?.let { percentage ->
+                priceDisplay
+                    .multiply(BigDecimal.valueOf((100 - percentage).toLong()))
+                    .divide(BigDecimal.valueOf(100))
+                    .setScale(2, RoundingMode.HALF_UP)
+            }
 
         return AdminWatchController.WatchDetailsView(
             thumbnailUrl = watch.thumbnailUrl,
             heroUrl = watch.heroUrl,
+
             brand = watch.brand,
             name = watch.name,
             description = watch.description,
             sizes = watch.sizes,
-            priceDisplay = BigDecimal.valueOf(watch.price.toLong(), 2),
+            priceDisplay = priceDisplay,
+            discountedPriceDisplay = discountedPriceDisplay,
             unitsSold = watch.unitsSold,
+
             isOOS = watch.isOOS,
             isDiscounted = watch.isDiscounted,
             isNew = watch.isNew,
             isPopular = watch.isPopular,
+
+            discountPercentage = watch.discountPercentage,
         )
     }
 }
