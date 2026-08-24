@@ -9,16 +9,24 @@ import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
 import java.util.*
 
-// GET http://localhost:8080/admin/watches?id=123
-// GET http://localhost:8080/admin/watches/create
-// GET http://localhost:8080/admin/watches/update?id=123
-// GET http://localhost:8080/admin/watches/delete?id=123
 // GET http://localhost:8080/admin/watches/generate-details?prompt=bla_bla
+
+// GET http://localhost:8080/admin/watches/details/{watchId} : details.html template
+
+// GET http://localhost:8080/admin/watches/create : create.html template
+// POST http://localhost:8080/admin/watches/save
+
+// GET http://localhost:8080/admin/watches/edit/{watchId} : edit.html template
+// POST http://localhost:8080/admin/watches/update/{watchId}
+
+// GET http://localhost:8080/admin/watches/delete/{watchId}
+
+// GET http://localhost:8080/admin/watches/list : list.html template
 
 @Controller
 @RequestMapping("/admin/watches")
 class AdminWatchController(
-    val watchService: WatchService
+    val adminWatchService: AdminWatchService
 ) {
 
     data class WatchDetails(
@@ -48,9 +56,9 @@ class AdminWatchController(
         @Max(1_000_000)
         var priceDisplay: BigDecimal, // multiply by 100 to store and divide by 100 to retrieve
 
-        var isOOS: Boolean? = null, // Out Of Stock
-        var isDiscounted: Boolean? = null,
-        var isNew: Boolean? = null,
+        var isOOS: Boolean = false, // Out Of Stock
+        var isDiscounted: Boolean = false,
+        var isNew: Boolean = true,
 
         @Min(1)
         @Max(100)
@@ -78,9 +86,9 @@ class AdminWatchController(
         @Max(1_000_000)
         var priceDisplay: BigDecimal, // multiply by 100 to store and divide by 100 to retrieve
 
-        var isOOS: Boolean?, // Out Of Stock
-        var isDiscounted: Boolean?,
-        var isNew: Boolean?,
+        var isOOS: Boolean, // Out Of Stock
+        var isDiscounted: Boolean,
+        var isNew: Boolean,
 
         @Min(1)
         @Max(100)
@@ -99,10 +107,10 @@ class AdminWatchController(
         val discountedPriceDisplay: BigDecimal?,
         val unitsSold: Long,
 
-        var isOOS: Boolean? = null, // Out Of Stock
-        var isDiscounted: Boolean? = null,
-        var isNew: Boolean? = null,
-        val isPopular: Boolean?,
+        var isOOS: Boolean, // Out Of Stock
+        var isDiscounted: Boolean,
+        var isNew: Boolean,
+        val isPopular: Boolean,
 
         var discountPercentage: Int? = null,
     )
@@ -114,7 +122,7 @@ class AdminWatchController(
     fun saveWatch(
         @ModelAttribute @Valid saveWatchRequest: SaveWatchRequest
     ): String {
-        watchService.saveWatch(saveWatchRequest)
+        adminWatchService.saveWatch(saveWatchRequest)
         return "redirect:/admin/watches/list"
     }
 
@@ -122,7 +130,7 @@ class AdminWatchController(
     @GetMapping("/generate-details")
     fun generateDetails(
         @RequestParam prompt: String,
-    ) = watchService.generateDetails(prompt)
+    ) = adminWatchService.generateDetails(prompt)
 
     @GetMapping("/list")
     fun listWatchesTemplate(
@@ -130,7 +138,7 @@ class AdminWatchController(
     ): String {
         model.addAttribute(
             "watches",
-            watchService.listWatches()
+            adminWatchService.listWatches()
         )
         return "admin/watch/list"
     }
@@ -139,7 +147,7 @@ class AdminWatchController(
     fun deleteWatch(
         @PathVariable watchId: UUID,
     ): String {
-        watchService.deleteWatchById(watchId)
+        adminWatchService.deleteWatchById(watchId)
         return "redirect:/admin/watches/list"
     }
 
@@ -151,7 +159,7 @@ class AdminWatchController(
         model.addAttribute("watchId", watchId)
         model.addAttribute(
             "watch",
-            watchService.getWatchForEdit(watchId)
+            adminWatchService.getWatchForEdit(watchId)
         )
 
         return "admin/watch/edit"
@@ -162,7 +170,7 @@ class AdminWatchController(
         @PathVariable watchId: UUID,
         @ModelAttribute @Valid editWatchRequest: SaveWatchRequest,
     ): String {
-        watchService.updateWatchById(watchId, editWatchRequest)
+        adminWatchService.updateWatchById(watchId, editWatchRequest)
         return "redirect:/admin/watches/list"
     }
 
@@ -174,7 +182,7 @@ class AdminWatchController(
         model.addAttribute("watchId", watchId)
         model.addAttribute(
             "watch",
-            watchService.getWatchForDetails(watchId)
+            adminWatchService.getWatchForDetails(watchId)
         )
 
         return "admin/watch/details"

@@ -34,14 +34,14 @@ data class Watch(
     @Column(name = "units_sold", nullable = false)
     var unitsSold: Long,
 
-    @Column(name = "is_oos")
-    var isOOS: Boolean? = null, // Out Of Stock
-    @Column(name = "is_discounted")
-    var isDiscounted: Boolean? = null,
-    @Column(name = "is_new")
-    var isNew: Boolean? = null,
-    @Column(name = "is_popular")
-    var isPopular: Boolean? = null, // true if units sold > 20 and the median of reviews >= 4.0
+    @Column(name = "is_oos", nullable = false)
+    var isOOS: Boolean = false, // Out Of Stock
+    @Column(name = "is_discounted", nullable = false)
+    var isDiscounted: Boolean = false,
+    @Column(name = "is_new", nullable = false)
+    var isNew: Boolean = true,
+    @Column(name = "is_popular", nullable = false)
+    var isPopular: Boolean = false, // true if units sold > 20 and the median of reviews >= 4.0
 
     @Column(name = "discount_percentage")
     var discountPercentage: Int? = null,
