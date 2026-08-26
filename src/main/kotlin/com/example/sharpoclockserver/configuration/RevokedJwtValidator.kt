@@ -1,5 +1,6 @@
 package com.example.sharpoclockserver.configuration
 
+import com.example.sharpoclockserver.model.snapshot.RevokedAccessTokenStore
 import org.springframework.data.redis.RedisConnectionFailureException
 import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.OAuth2TokenValidator

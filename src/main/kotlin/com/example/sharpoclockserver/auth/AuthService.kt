@@ -1,6 +1,5 @@
 package com.example.sharpoclockserver.auth
 
-import com.example.sharpoclockserver.configuration.RevokedAccessTokenStore
 import com.example.sharpoclockserver.email.EmailService
 import com.example.sharpoclockserver.model.Customer
 import com.example.sharpoclockserver.model.PasswordResetChallenge
@@ -8,6 +7,7 @@ import com.example.sharpoclockserver.model.RefreshToken
 import com.example.sharpoclockserver.model.repository.CustomerRepository
 import com.example.sharpoclockserver.model.repository.PasswordResetChallengeRepository
 import com.example.sharpoclockserver.model.repository.RefreshTokenRepository
+import com.example.sharpoclockserver.model.snapshot.RevokedAccessTokenStore
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.codec.EncodingException

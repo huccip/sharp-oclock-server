@@ -3,10 +3,12 @@ package com.example.sharpoclockserver.product
 import com.cloudinary.Cloudinary
 import com.cloudinary.utils.ObjectUtils
 import com.example.sharpoclockserver.model.Watch
+import com.example.sharpoclockserver.model.indexer.SemanticWatchSearchIndexer
 import com.example.sharpoclockserver.model.repository.WatchRepository
 import jakarta.transaction.Transactional
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.math.BigDecimal
@@ -19,7 +21,8 @@ class AdminWatchService(
     private val watchRepository: WatchRepository,
     @Qualifier("adminListingAssistantChatClient")
     private val chatClient: ChatClient,
-    private val cloudinary: Cloudinary
+    private val cloudinary: Cloudinary,
+    private val semanticWatchSearchIndexer: SemanticWatchSearchIndexer
 ) {
 
     private data class UploadedImage(
@@ -34,7 +37,7 @@ class AdminWatchService(
             .user(prompt)
             .call()
             .entity(AdminWatchController.WatchDetails::class.java)
-            ?: error("Couldn't create AdminWatchController for prompt $prompt")
+            ?: error("Couldn't create Watch Details for prompt $prompt")
 
     private fun uploadImage(
         file: MultipartFile,
@@ -66,6 +69,7 @@ class AdminWatchService(
         )
     }
 
+    @Transactional
     fun saveWatch(
         saveWatchRequest: AdminWatchController.SaveWatchRequest
     ) {
@@ -106,15 +110,23 @@ class AdminWatchService(
         )
 
         watchRepository.save(newWatch)
+        semanticWatchSearchIndexer.index(newWatch)
     }
 
-    fun listWatches(): List<Watch> = watchRepository.findAll()
+    fun listWatches(): List<Watch> =
+        watchRepository.findAll(
+            Sort.by(
+                Sort.Direction.DESC,
+                "createdAt"
+            )
+        )
 
     @Transactional
     fun deleteWatchById(watchId: UUID) {
         val watch = getWatchById(watchId)
 
         watchRepository.delete(watch)
+        semanticWatchSearchIndexer.delete(watch.id)
         cloudinary.uploader().destroy(watch.thumbnailPublicId, ObjectUtils.emptyMap())
         cloudinary.uploader().destroy(watch.heroPublicId, ObjectUtils.emptyMap())
     }
@@ -151,7 +163,9 @@ class AdminWatchService(
             lastEditedAt = Instant.now()
         )
 
-        watchRepository.save(editedWatch)
+        val updatedWatch = watchRepository.save(editedWatch)
+        semanticWatchSearchIndexer.delete(updatedWatch.id)
+        semanticWatchSearchIndexer.index(updatedWatch)
 
         uploadedThumbnail?.let {
             cloudinary.uploader().destroy(watchToEdit.thumbnailPublicId, ObjectUtils.emptyMap())

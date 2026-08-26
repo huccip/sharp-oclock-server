@@ -11,17 +11,17 @@ import java.util.*
 
 // GET http://localhost:8080/admin/watches/generate-details?prompt=bla_bla
 
-// GET http://localhost:8080/admin/watches/details/{watchId} : details.html template
+// GET http://localhost:8080/admin/watches/details/{watchId}: details.html template
 
-// GET http://localhost:8080/admin/watches/create : create.html template
-// POST http://localhost:8080/admin/watches/save
+// GET http://localhost:8080/admin/watches/create: create.html template
+// POST http://localhost:8080/admin/watches/save: saves then embeds in pg-vector store
 
-// GET http://localhost:8080/admin/watches/edit/{watchId} : edit.html template
-// POST http://localhost:8080/admin/watches/update/{watchId}
+// GET http://localhost:8080/admin/watches/edit/{watchId}: edit.html template
+// POST http://localhost:8080/admin/watches/update/{watchId}: updates then re-embeds in pg-vector store
 
-// GET http://localhost:8080/admin/watches/delete/{watchId}
+// GET http://localhost:8080/admin/watches/delete/{watchId}: deletes then deletes its embedding in pg-vector store
 
-// GET http://localhost:8080/admin/watches/list : list.html template
+// GET http://localhost:8080/admin/watches/list: list.html template
 
 @Controller
 @RequestMapping("/admin/watches")

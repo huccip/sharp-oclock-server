@@ -1,5 +1,6 @@
 package com.example.sharpoclockserver.configuration
 
+import com.example.sharpoclockserver.model.snapshot.RevokedAccessTokenStore
 import jakarta.servlet.DispatcherType
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

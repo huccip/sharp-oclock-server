@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class AiConfig {
 
-    // for admin: generating catalog entries in a structured output
     @Bean
     fun adminListingAssistantChatClient(
         chatClientBuilder: ChatClient.Builder
@@ -19,23 +18,6 @@ class AiConfig {
             )
             .build()
 
-//    // for mobile: RAG based search over the watches catalog
-//    @Bean
-//    fun mobileRAGSearchChatClient(
-//        chatClientBuilder: ChatClient.Builder,
-//        vectorStore: VectorStore
-//    ): ChatClient =
-//        chatClientBuilder
-//            .defaultSystem(
-//                "You help customers find watches. Use ONLY the retrieved catalog " +
-//                        "context to answer. If nothing matches, say so."
-//            )
-//            .defaultAdvisors(
-//                QuestionAnswerAdvisor.builder(vectorStore).build()
-//            )
-//            .build()
-//
-//    // for mobile: watch recommendation system by age, RAG flavored
 //    @Bean
 //    fun mobileRAGRecommendationChatClient(
 //        chatClientBuilder: ChatClient.Builder,
@@ -44,7 +26,7 @@ class AiConfig {
 //        chatClientBuilder
 //            .defaultSystem(
 //                "You recommend watches from the catalog based on the user's " +
-//                        "profile (e.g. age). Return a short ranked list."
+//                        "profile (e.g. age, budget, previous orders, ...Etc). Return a short ranked list."
 //            )
 //            .defaultAdvisors(
 //                QuestionAnswerAdvisor.builder(vectorStore).build()

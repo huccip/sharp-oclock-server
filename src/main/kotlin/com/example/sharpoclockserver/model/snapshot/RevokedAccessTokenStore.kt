@@ -1,4 +1,4 @@
-package com.example.sharpoclockserver.configuration
+package com.example.sharpoclockserver.model.snapshot
 
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component

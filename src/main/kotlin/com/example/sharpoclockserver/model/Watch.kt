@@ -50,4 +50,15 @@ data class Watch(
     val createdAt: Instant = Instant.now(),
     @Column(name = "last_edited_at", updatable = true)
     val lastEditedAt: Instant? = null
-)
+) {
+    override fun toString(): String = """
+        Brand: $brand
+        Model: $name
+        Description: $description
+        Sizes: ${sizes.joinToString()}
+        Price in USD: ${price / 100.0}
+        Popularity: $isPopular
+        New Arrival: $isNew
+        Discounted: $isDiscounted
+    """.trimIndent()
+}
