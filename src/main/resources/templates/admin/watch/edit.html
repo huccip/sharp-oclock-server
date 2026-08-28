@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Edit Watch</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page">
+<main class="admin-panel">
+    <header class="admin-header">
+        <div>
+            <p class="admin-subtitle">Editing watch</p>
+            <h1 class="admin-title" th:text="${watch.brand + ' ' + watch.name}">Edit Watch</h1>
+        </div>
+        <a class="admin-link" th:href="@{/admin/watches/list}">Back to Watches</a>
+    </header>
+
+    <form class="admin-form" enctype="multipart/form-data"
+          method="post" th:action="@{/admin/watches/update/{watchId}(watchId=${watchId})}">
+        <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden">
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="brand">Brand</label>
+                <input class="form-control" id="brand" name="brand" required th:value="${watch.brand}" type="text">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="name">Watch Name</label>
+                <input class="form-control" id="name" name="name" required th:value="${watch.name}" type="text">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="priceDisplay">Price ($USD)</label>
+                <input class="form-control" id="priceDisplay" max="1000000" min="40" name="priceDisplay" required
+                       step="0.01" th:value="${watch.priceDisplay}" type="number">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="sizes">Available Sizes (Comma Separated)</label>
+                <input class="form-control" id="sizes" name="sizes"
+                       required th:value="${#strings.listJoin(watch.sizes, ', ')}" type="text">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label" for="thumbnailImage">Thumbnail Image (Small)</label>
+                <img class="details-thumbnail" th:alt="${watch.name + ' thumbnail'}"
+                     th:src="${watch.thumbnailUrl}">
+                <input accept="image/png,image/jpeg,image/webp" class="form-control" id="thumbnailImage"
+                       name="thumbnailImage" type="file">
+                <p class="form-note">Leave empty to keep the current thumbnail.</p>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="heroImage">Hero Image (Big)</label>
+                <img class="details-thumbnail" th:alt="${watch.name + ' hero image'}"
+                     th:src="${watch.heroUrl}">
+                <input accept="image/png,image/jpeg,image/webp" class="form-control" id="heroImage"
+                       name="heroImage" type="file">
+                <p class="form-note">Leave empty to keep the current hero image.</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="description">Description</label>
+            <textarea class="form-control form-textarea" id="description" name="description"
+                      required th:text="${watch.description}"></textarea>
+        </div>
+
+        <div class="checkbox-panel">
+            <input name="_isNew" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" name="isNew" th:checked="${watch.isNew == true}"
+                       type="checkbox" value="true">
+                Mark as New
+            </label>
+
+            <input name="_isDiscounted" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" id="isDiscounted" name="isDiscounted"
+                       th:checked="${watch.isDiscounted == true}"
+                       type="checkbox" value="true">
+                Is Discounted
+            </label>
+
+            <input name="_isOOS" type="hidden" value="on">
+            <label class="checkbox-label">
+                <input class="checkbox-control" name="isOOS" th:checked="${watch.isOOS == true}"
+                       type="checkbox" value="true">
+                Out of Stock
+            </label>
+        </div>
+
+        <div class="form-group"
+             id="discountPercentageContainer"
+             th:hidden="${watch.isDiscounted != true}">
+
+            <label class="form-label" for="discountPercentage">
+                Discount Percentage
+            </label>
+
+            <input class="form-control"
+                   id="discountPercentage"
+                   max="100"
+                   min="1"
+                   name="discountPercentage"
+                   placeholder="50 (%)"
+                   th:required="${watch.isDiscounted == true}"
+                   th:value="${watch.discountPercentage}"
+                   type="number">
+        </div>
+
+        <p class="form-note">Units sold and popular status are preserved and cannot be edited here.</p>
+
+        <div class="button-row">
+            <a class="btn btn-secondary" th:href="@{/admin/watches/list}">Cancel</a>
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+        </div>
+    </form>
+</main>
+
+<script>
+    const isDiscountedCheckbox = document.querySelector('#isDiscounted');
+    const discountPercentageContainer = document.querySelector('#discountPercentageContainer');
+    const discountPercentageInput = document.querySelector('#discountPercentage');
+
+    isDiscountedCheckbox.addEventListener('change', (e) => {
+        discountPercentageContainer.hidden = !e.target.checked
+        discountPercentageInput.required = e.target.checked
+
+        if (!e.target.checked) discountPercentageInput.value = ''
+    });
+</script>
+
+</body>
+</html>

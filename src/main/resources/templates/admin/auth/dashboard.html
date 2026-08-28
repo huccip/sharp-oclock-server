@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page">
+<main class="admin-panel admin-panel-wide">
+    <header class="admin-header">
+        <div>
+            <p class="admin-eyebrow">Sharp O'Clock</p>
+            <h1 class="admin-title-large">Admin dashboard</h1>
+            <p class="admin-subtitle">Signed in as <span sec:authentication="name"></span></p>
+        </div>
+
+        <form method="post" th:action="@{/admin/sign-out}">
+            <button class="btn btn-secondary btn-small" type="submit">Sign out</button>
+        </form>
+    </header>
+
+    <section class="dashboard-grid">
+        <a class="dashboard-card" th:href="@{/admin/watches/list}">
+            <h2 class="dashboard-card-title">Watch catalog</h2>
+            <p class="dashboard-card-text">View, create, edit, and remove watches available in the store.</p>
+        </a>
+
+        <a class="dashboard-card" th:href="@{/admin/watches/create}">
+            <h2 class="dashboard-card-title">Add a watch</h2>
+            <p class="dashboard-card-text">Create a product listing manually or use the AI assistant.</p>
+        </a>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,358 @@
+@import "tailwindcss";
+
+@source "../resources/templates/admin/**/*.html";
+
+@layer components {
+    .admin-page {
+        @apply min-h-screen bg-slate-900 p-4 font-sans text-slate-100 md:p-8;
+    }
+
+    .admin-page-centered {
+        @apply grid place-items-center;
+    }
+
+    .admin-panel {
+        @apply mx-auto w-full max-w-4xl rounded-xl border border-slate-700 bg-slate-800 p-5 shadow-2xl md:p-8;
+    }
+
+    .admin-panel-wide {
+        @apply max-w-6xl;
+    }
+
+    .admin-panel-compact {
+        @apply max-w-md;
+    }
+
+    .admin-header {
+        @apply mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
+    }
+
+    .admin-title {
+        @apply text-2xl font-bold text-amber-400;
+    }
+
+    .admin-title-large {
+        @apply text-3xl font-bold text-slate-100;
+    }
+
+    .admin-eyebrow {
+        @apply text-sm font-semibold uppercase tracking-wider text-amber-400;
+    }
+
+    .admin-subtitle {
+        @apply text-sm text-slate-400;
+    }
+
+    .admin-link {
+        @apply text-sm text-slate-300 transition hover:text-amber-400;
+    }
+
+    .admin-link-accent {
+        @apply text-amber-400 transition hover:text-amber-300;
+    }
+
+    .admin-form {
+        @apply space-y-6;
+    }
+
+    .form-grid {
+        @apply grid grid-cols-1 gap-6 md:grid-cols-2;
+    }
+
+    .form-group {
+        @apply space-y-1;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-slate-200;
+    }
+
+    .form-control {
+        @apply w-full rounded-lg border border-slate-700 bg-slate-900 p-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/10;
+    }
+
+    .form-textarea {
+        @apply min-h-32 resize-y;
+    }
+
+    .checkbox-panel {
+        @apply flex flex-wrap gap-6 rounded-lg bg-slate-900/50 p-4;
+    }
+
+    .checkbox-label {
+        @apply inline-flex cursor-pointer items-center gap-2 text-sm text-slate-200;
+    }
+
+    .checkbox-control {
+        @apply size-4 rounded accent-amber-400;
+    }
+
+    .form-note {
+        @apply text-xs italic text-slate-500;
+    }
+
+    .ai-panel {
+        @apply mb-8 rounded-lg border border-amber-500/30 bg-slate-900/80 p-4;
+    }
+
+    .ai-panel-title {
+        @apply mb-2 block text-sm font-semibold text-amber-300;
+    }
+
+    .ai-controls {
+        @apply flex flex-col gap-3 sm:flex-row;
+    }
+
+    .ai-input {
+        @apply flex-1;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center rounded-lg px-4 py-3 font-bold transition disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-primary {
+        @apply bg-amber-500 text-slate-900 hover:bg-amber-600;
+    }
+
+    .btn-secondary {
+        @apply bg-slate-700 text-slate-100 hover:bg-slate-600;
+    }
+
+    .btn-danger {
+        @apply border border-red-500/50 bg-red-500/20 text-red-300 hover:bg-red-500/30;
+    }
+
+    .btn-small {
+        @apply px-4 py-2 text-sm;
+    }
+
+    .btn-full {
+        @apply w-full;
+    }
+
+    .button-row {
+        @apply flex flex-col-reverse gap-3 sm:flex-row;
+    }
+
+    .button-row > * {
+        @apply flex-1;
+    }
+
+    .notice {
+        @apply mb-4 rounded-lg border px-4 py-3 text-sm;
+    }
+
+    .notice-error {
+        @apply border-red-500/40 bg-red-500/15 text-red-200;
+    }
+
+    .notice-success {
+        @apply border-emerald-500/40 bg-emerald-500/15 text-emerald-200;
+    }
+
+    .notice-warning {
+        @apply border-amber-500/40 bg-amber-500/15 text-amber-200;
+    }
+
+    .empty-state {
+        @apply rounded-lg border border-dashed border-slate-700 p-8 text-center text-slate-400;
+    }
+
+    .table-shell {
+        @apply overflow-x-auto rounded-lg border border-slate-700;
+    }
+
+    .admin-table {
+        @apply w-full text-sm;
+    }
+
+    .admin-table thead {
+        @apply bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        @apply p-3;
+    }
+
+    .admin-table th {
+        @apply text-left;
+    }
+
+    .admin-table tbody tr {
+        @apply border-t border-slate-700 transition hover:bg-slate-900/40;
+    }
+
+    .table-number {
+        @apply text-right;
+    }
+
+    .table-muted {
+        @apply text-slate-400;
+    }
+
+    .table-actions {
+        @apply whitespace-nowrap text-right;
+    }
+
+    .watch-thumbnail {
+        @apply size-14 rounded-lg border border-slate-700 object-cover;
+    }
+
+    .badge-list {
+        @apply flex flex-wrap gap-1;
+    }
+
+    .badge {
+        @apply rounded-full border px-2 py-0.5 text-xs font-semibold;
+    }
+
+    .badge-new {
+        @apply border-amber-500/40 bg-amber-500/20 text-amber-300;
+    }
+
+    .badge-sale {
+        @apply border-emerald-500/40 bg-emerald-500/20 text-emerald-300;
+    }
+
+    .badge-danger {
+        @apply border-red-500/40 bg-red-500/20 text-red-300;
+    }
+
+    .badge-popular {
+        @apply border-indigo-500/40 bg-indigo-500/20 text-indigo-300;
+    }
+
+    .badge-standard {
+        @apply border-slate-600 bg-slate-700 text-slate-300;
+    }
+
+    .action-link {
+        @apply border-0 bg-transparent p-0 transition;
+    }
+
+    .action-details {
+        @apply text-sky-400 hover:text-sky-300;
+    }
+
+    .action-edit {
+        @apply ml-3 text-amber-400 hover:text-amber-300;
+    }
+
+    .action-delete {
+        @apply ml-3 cursor-pointer text-red-400 hover:text-red-300;
+    }
+
+    .inline-form {
+        @apply inline;
+    }
+
+    .details-grid {
+        @apply grid grid-cols-1 gap-8 lg:grid-cols-2;
+    }
+
+    .details-image-panel {
+        @apply relative overflow-hidden rounded-xl border border-slate-700 bg-slate-900;
+    }
+
+    .details-hero-image {
+        @apply h-96 w-full object-cover;
+    }
+
+    .details-content {
+        @apply space-y-6;
+    }
+
+    .details-label {
+        @apply mb-1 text-xs uppercase tracking-wider text-slate-500;
+    }
+
+    .details-value {
+        @apply font-semibold text-slate-200;
+    }
+
+    .details-price {
+        @apply text-3xl font-bold text-amber-400;
+    }
+
+    .details-price-row {
+        @apply flex flex-wrap items-baseline gap-3;
+    }
+
+    .details-price-original {
+        @apply text-lg font-semibold text-slate-500 line-through;
+    }
+
+    .details-price-discounted {
+        @apply text-3xl font-bold text-emerald-400;
+    }
+
+    .details-discount-badge {
+        @apply absolute right-4 top-4 rounded-full border border-red-400/50 bg-red-500 px-3 py-1.5 text-sm font-bold text-white shadow-lg;
+    }
+
+    .details-meta-grid {
+        @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+    }
+
+    .details-thumbnail {
+        @apply size-24 rounded-lg border border-slate-700 object-cover;
+    }
+
+    .watch-id {
+        @apply break-all text-xs text-slate-400;
+    }
+
+    .description-panel {
+        @apply mt-8 rounded-xl border border-slate-700 bg-slate-900/60 p-6;
+    }
+
+    .description-title {
+        @apply mb-3 text-lg font-bold text-amber-400;
+    }
+
+    .description-text {
+        @apply whitespace-pre-line leading-7 text-slate-300;
+    }
+
+    .details-actions {
+        @apply mt-8 flex flex-col gap-3 sm:flex-row;
+    }
+
+    .details-actions > * {
+        @apply flex-1;
+    }
+
+    .auth-brand {
+        @apply mb-6 text-center;
+    }
+
+    .auth-brand-mark {
+        @apply mb-2 text-sm font-semibold uppercase tracking-[0.25em] text-amber-400;
+    }
+
+    .auth-title {
+        @apply text-2xl font-bold text-slate-100;
+    }
+
+    .auth-subtitle {
+        @apply mt-2 text-sm text-slate-400;
+    }
+
+    .dashboard-grid {
+        @apply grid grid-cols-1 gap-4 md:grid-cols-2;
+    }
+
+    .dashboard-card {
+        @apply rounded-xl border border-slate-700 bg-slate-900/60 p-6 transition hover:border-amber-500/40;
+    }
+
+    .dashboard-card-title {
+        @apply mb-2 text-lg font-bold text-amber-400;
+    }
+
+    .dashboard-card-text {
+        @apply text-sm leading-6 text-slate-400;
+    }
+}

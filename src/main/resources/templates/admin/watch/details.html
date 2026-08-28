@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Sharp O'Clock Admin - Watch Details</title>
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+</head>
+<body class="admin-page">
+<main class="admin-panel admin-panel-wide">
+    <header class="admin-header">
+        <div>
+            <p class="admin-eyebrow" th:text="${watch.brand}">Brand</p>
+            <h1 class="admin-title-large" th:text="${watch.name}">Watch Name</h1>
+        </div>
+        <a class="admin-link" th:href="@{/admin/watches/list}">Back to Watches</a>
+    </header>
+
+    <section class="details-grid">
+        <div class="details-image-panel">
+            <img class="details-hero-image" th:alt="${watch.name}" th:src="${watch.heroUrl}">
+            <span class="details-discount-badge"
+                  th:if="${watch.isDiscounted == true and watch.discountPercentage != null}"
+                  th:text="|${watch.discountPercentage}% OFF|">20% OFF</span>
+        </div>
+
+        <div class="details-content">
+            <div>
+                <p class="details-label">Price</p>
+                <div class="details-price-row" th:if="${watch.discountedPriceDisplay != null}">
+                    <p class="details-price-original"
+                       th:text="'$' + ${#numbers.formatDecimal(watch.priceDisplay, 1, 2)}">$0.00</p>
+                    <p class="details-price-discounted"
+                       th:text="'$' + ${#numbers.formatDecimal(watch.discountedPriceDisplay, 1, 2)}">$0.00</p>
+                </div>
+                <p class="details-price" th:if="${watch.discountedPriceDisplay == null}"
+                   th:text="'$' + ${#numbers.formatDecimal(watch.priceDisplay, 1, 2)}">$0.00</p>
+            </div>
+
+            <div>
+                <p class="details-label">Status</p>
+                <div class="badge-list">
+                    <span class="badge badge-new" th:if="${watch.isNew == true}">NEW</span>
+                    <span class="badge badge-sale" th:if="${watch.isDiscounted == true}">
+                        SALE<span th:if="${watch.discountPercentage != null}"
+                                  th:text="| - ${watch.discountPercentage}%|"></span>
+                    </span>
+                    <span class="badge badge-danger" th:if="${watch.isOOS == true}">OUT OF STOCK</span>
+                    <span class="badge badge-popular" th:if="${watch.isPopular == true}">POPULAR</span>
+                    <span class="badge badge-standard"
+                          th:if="${watch.isNew != true and watch.isDiscounted != true and watch.isOOS != true and watch.isPopular != true}">STANDARD</span>
+                </div>
+            </div>
+
+            <div>
+                <p class="details-label">Available Sizes</p>
+                <p class="details-value" th:text="${#strings.listJoin(watch.sizes, ', ')}">40mm</p>
+            </div>
+
+            <div>
+                <p class="details-label">Units Sold</p>
+                <p class="details-value" th:text="${watch.unitsSold}">0</p>
+            </div>
+
+            <div class="details-meta-grid">
+                <div>
+                    <p class="details-label">Thumbnail</p>
+                    <img class="details-thumbnail" th:alt="${watch.name + ' thumbnail'}"
+                         th:src="${watch.thumbnailUrl}">
+                </div>
+                <div>
+                    <p class="details-label">Watch ID</p>
+                    <p class="watch-id" th:text="${watchId}">Watch ID</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="description-panel">
+        <h2 class="description-title">Description</h2>
+        <p class="description-text" th:text="${watch.description}">Watch description</p>
+    </section>
+
+    <div class="details-actions">
+        <a class="btn btn-primary"
+           th:href="@{/admin/watches/edit/{watchId}(watchId=${watchId})}">Edit Watch</a>
+        <form method="post"
+              onsubmit="return confirm('Are you sure you want to delete this watch?')" th:action="@{/admin/watches/delete/{watchId}(watchId=${watchId})}">
+            <button class="btn btn-danger btn-full" type="submit">Delete Watch</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

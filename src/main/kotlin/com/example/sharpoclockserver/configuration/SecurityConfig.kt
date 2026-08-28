@@ -1,5 +1,7 @@
 package com.example.sharpoclockserver.configuration
 
+import com.example.sharpoclockserver.model.snapshot.RevokedAccessTokenStore
+import jakarta.servlet.DispatcherType
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -110,6 +112,8 @@ class SecurityConfig {
             .securityMatcher("/admin/**")
             .authorizeHttpRequests { httpRequest ->
                 httpRequest
+                    .dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll()
                     .requestMatchers("/admin/sign-in")
                     .permitAll()
                     .anyRequest()
@@ -120,7 +124,7 @@ class SecurityConfig {
                 it.loginProcessingUrl("/admin/sign-in")
                 it.usernameParameter("identifier")
                 it.passwordParameter("password")
-                it.defaultSuccessUrl("/admin/dashboard", true)
+                it.defaultSuccessUrl("/admin/dashboard", false)
                 it.failureUrl("/admin/sign-in?error")
                 it.permitAll()
             }
@@ -143,6 +147,15 @@ class SecurityConfig {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { httpRequest ->
                 httpRequest
+                    .dispatcherTypeMatchers(DispatcherType.ERROR)
+                    .permitAll()
+                    .requestMatchers(
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/favicon.ico",
+                    )
+                    .permitAll()
                     .requestMatchers(
                         HttpMethod.POST,
                         "/auth/sign-up",
