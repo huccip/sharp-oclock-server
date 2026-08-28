@@ -61,7 +61,7 @@
                 <td class="table-number"
                     th:text="'$' + ${#numbers.formatDecimal(watch.price / 100.0, 1, 2)}">$0.00
                 </td>
-                <td class="table-muted" th:text="${#strings.listJoin(watch.sizes, ', ')}">40mm</td>
+                <td class="table-muted" th:text="${#strings.listJoin(watch.sizes, 'mm, ')}">40mm</td>
                 <td class="table-number table-muted" th:text="${watch.unitsSold}">0</td>
                 <td>
                     <div class="badge-list">

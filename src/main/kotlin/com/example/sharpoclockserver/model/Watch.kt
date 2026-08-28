@@ -28,7 +28,7 @@ data class Watch(
     @Column(columnDefinition = "text", nullable = false)
     var description: String,
     @Column(nullable = false)
-    var sizes: List<String>,
+    var sizes: List<Int>, // in mm
     @Column(nullable = false)
     var price: Int, // multiply by 100 to store and divide by 100 to retrieve
     @Column(name = "units_sold", nullable = false)

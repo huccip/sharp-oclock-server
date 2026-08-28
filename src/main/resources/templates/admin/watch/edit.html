@@ -40,7 +40,7 @@
             <div class="form-group">
                 <label class="form-label" for="sizes">Available Sizes (Comma Separated)</label>
                 <input class="form-control" id="sizes" name="sizes"
-                       required th:value="${#strings.listJoin(watch.sizes, ', ')}" type="text">
+                       required th:value="${#strings.listJoin(watch.sizes, 'mm, ')}" type="text">
             </div>
         </div>
 
