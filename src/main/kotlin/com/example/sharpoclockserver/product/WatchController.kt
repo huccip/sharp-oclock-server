@@ -35,7 +35,7 @@ class WatchController(
         val brand: String,
         val name: String,
         val description: String,
-        val sizes: List<String>,
+        val sizes: List<Int>,
         val price: Int,
         val unitsSold: Long,
 

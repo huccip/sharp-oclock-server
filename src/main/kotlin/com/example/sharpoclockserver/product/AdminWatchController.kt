@@ -50,7 +50,7 @@ class AdminWatchController(
         var description: String,
         @NotNull
         @NotEmpty
-        var sizes: List<String>,
+        var sizes: List<Int>,
         @NotNull
         @Min(40)
         @Max(1_000_000)
@@ -80,7 +80,7 @@ class AdminWatchController(
         var description: String,
         @NotNull
         @NotEmpty
-        var sizes: List<String>,
+        var sizes: List<Int>,
         @NotNull
         @Min(40)
         @Max(1_000_000)
@@ -102,7 +102,7 @@ class AdminWatchController(
         var brand: String,
         var name: String,
         var description: String,
-        var sizes: List<String>,
+        var sizes: List<Int>,
         var priceDisplay: BigDecimal, // multiply by 100 to store and divide by 100 to retrieve
         val discountedPriceDisplay: BigDecimal?,
         val unitsSold: Long,
