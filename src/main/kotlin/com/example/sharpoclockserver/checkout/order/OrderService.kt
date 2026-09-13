@@ -1,5 +1,6 @@
 package com.example.sharpoclockserver.checkout.order
 
+import com.example.sharpoclockserver.checkout.order.payment.cash.CashOnDeliveryService
 import com.example.sharpoclockserver.model.*
 import com.example.sharpoclockserver.model.repository.CartRepository
 import com.example.sharpoclockserver.model.repository.OrderRepository
@@ -17,6 +18,8 @@ class OrderService(
     private val orderRepository: OrderRepository,
     private val cartRepository: CartRepository,
     private val watchRepository: WatchRepository,
+
+    private val cashOnDeliveryService: CashOnDeliveryService
 ) {
 
     @Transactional(readOnly = true)
@@ -143,10 +146,21 @@ class OrderService(
         if (order.deliveryInfo == null) return badRequest("Delivery information is missing")
 
         val paymentMethod = order.paymentMethod ?: return badRequest("Payment method is missing")
-        if (paymentMethod != PaymentMethod.CASH_ON_DELIVERY) return ResponseEntity(
-            "$paymentMethod payment is not implemented yet",
-            HttpStatus.NOT_IMPLEMENTED,
-        )
+
+        when (paymentMethod) {
+            PaymentMethod.CASH_ON_DELIVERY -> {
+                cashOnDeliveryService.createPayment(
+                    orderId = orderId.toString(),
+                    customerId = customerId.toString()
+                )
+            }
+
+            PaymentMethod.STRIPE -> {
+
+            }
+
+            PaymentMethod.PAYPAL -> {}
+        }
 
         val watchesById = watchRepository
             .findAllByIdForUpdate(order.orderLines.map { line -> line.watchId })
@@ -189,7 +203,7 @@ class OrderService(
                 cart.cartLines.clear()
                 cart.updatedAt = Instant.now()
                 cartRepository.save(cart)
-            }
+            } ?: return notFound("cart")
 
         return ResponseEntity(
             orderRepository.save(order).toOrderResponse(),
@@ -239,6 +253,7 @@ class OrderService(
 
             orderLines.add(
                 OrderLine(
+                    id = UUID.randomUUID(),
                     watchId = watch.id,
                     watchBrand = watch.brand,
                     watchName = watch.name,

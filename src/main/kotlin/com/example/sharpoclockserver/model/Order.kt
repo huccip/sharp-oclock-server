@@ -54,11 +54,20 @@ data class Order(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: OrderStatus = OrderStatus.DRAFT,
+    @Column(name = "payment_status")
+    var paymentStatus: String? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
     @Column(name = "updated_at")
     var updatedAt: Instant? = null,
+
+    @Column(name = "cash_on_delivery_payment_id")
+    var cashOnDeliveryPaymentId: String? = null,
+    @Column(name = "stripe_payment_intent_id")
+    var stripePaymentIntentId: String? = null,
+    @Column(name = "paypal_payment_intent_id")
+    var paypalPaymentIntentId: String? = null,
 )
 
 @Embeddable
@@ -75,6 +84,10 @@ data class DeliveryInfo(
 
 @Embeddable
 data class OrderLine(
+    @Id
+    @Column(columnDefinition = "uuid", nullable = false, updatable = false)
+    val id: UUID,
+
     @Column(name = "watch_id", columnDefinition = "uuid", nullable = false, updatable = false)
     val watchId: UUID,
 
@@ -89,6 +102,10 @@ data class OrderLine(
     val quantity: Int,
     @Column(name = "unit_price_at_purchase", nullable = false)
     var unitPriceAtPurchase: Int,
+
+    @Column(name = "eligible_for_refund", nullable = false)
+    var eligibleForRefund: Boolean = true, // switches to false if refund duration in days ends (orderPlacedAt + CONSTANT_IN_DAYS)
+    var refunded: Boolean = false,
 )
 
 enum class OrderStatus {
