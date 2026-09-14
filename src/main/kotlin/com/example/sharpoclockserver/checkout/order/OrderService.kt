@@ -1,6 +1,7 @@
 package com.example.sharpoclockserver.checkout.order
 
 import com.example.sharpoclockserver.checkout.order.payment.cash.CashOnDeliveryService
+import com.example.sharpoclockserver.checkout.order.payment.stripe.StripeService
 import com.example.sharpoclockserver.model.*
 import com.example.sharpoclockserver.model.repository.CartRepository
 import com.example.sharpoclockserver.model.repository.OrderRepository
@@ -19,7 +20,8 @@ class OrderService(
     private val cartRepository: CartRepository,
     private val watchRepository: WatchRepository,
 
-    private val cashOnDeliveryService: CashOnDeliveryService
+    private val cashOnDeliveryService: CashOnDeliveryService,
+    private val stripeService: StripeService
 ) {
 
     @Transactional(readOnly = true)
@@ -158,8 +160,22 @@ class OrderService(
                 }
             }
 
-            PaymentMethod.STRIPE -> {}
-            PaymentMethod.PAYPAL -> {}
+            PaymentMethod.STRIPE -> {
+                val paymentResult = stripeService.createPaymentIntent(
+                    orderId = orderId.toString(),
+                    customerId = customerId.toString()
+                )
+                if (paymentResult.statusCode != HttpStatus.CREATED && paymentResult.statusCode != HttpStatus.OK) {
+                    return paymentResult
+                }
+            }
+
+            PaymentMethod.PAYPAL -> {
+                return ResponseEntity(
+                    "Not implemented yet",
+                    HttpStatus.NOT_IMPLEMENTED
+                )
+            }
         }
 
         val watchesById = watchRepository
