@@ -1,5 +1,6 @@
 package com.example.sharpoclockserver.checkout.order.payment.stripe
 
+import com.example.sharpoclockserver.email.EmailService
 import com.example.sharpoclockserver.model.OrderStatus
 import com.example.sharpoclockserver.model.PaymentStatus
 import com.example.sharpoclockserver.model.repository.OrderRepository
@@ -16,8 +17,9 @@ import java.util.*
 @Service
 class StripeWebhookHandler(
     private val orderRepository: OrderRepository,
-    @Value("\${stripe.webhook.secret}")
+    @Value($$"${stripe.webhook.secret}")
     private val webhookSecret: String,
+    private val emailService: EmailService
 ) {
     private val logger = LoggerFactory.getLogger(StripeWebhookHandler::class.java)
 
@@ -158,13 +160,22 @@ class StripeWebhookHandler(
             val metadata = dataObject.getAsJsonObject("metadata")
             val orderId = metadata.get("orderId")?.asString
                 ?: throw Exception("No orderId in charge metadata")
+            val customerId = metadata.get("customerId")?.asString
+                ?: throw Exception("No customerId in charge metadata")
             val reason = dataObject.get("reason")?.asString ?: "Unknown"
 
             logger.error("⚠️ DISPUTE FILED for order $orderId - requires manual review!")
             logger.error("Dispute reason: $reason")
 
-            // TODO: Send alert to admin, flag order for manual review
-            // For now just log it
+            try {
+                emailService.sendStripeChargeDisputeEmail(
+                    orderId = orderId,
+                    customerId = customerId,
+                    disputeReason = reason
+                )
+            } catch (e: Exception) {
+                logger.warn("Failed to send dispute alert email: ${e.message}")
+            }
 
             ResponseEntity.ok("Dispute noted")
         } catch (e: Exception) {

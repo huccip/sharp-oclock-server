@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>⚠️ Chargeback Dispute Filed - Immediate Action Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            color: white;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header .alert-icon {
+            font-size: 32px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 0;
+        }
+
+        .content {
+            padding: 32px 24px;
+        }
+
+        .alert-box {
+            background-color: #ffebee;
+            border-left: 4px solid #d32f2f;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-radius: 4px;
+        }
+
+        .alert-box p {
+            color: #c62828;
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .section {
+            margin-bottom: 28px;
+        }
+
+        .section h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .info-item {
+            background-color: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .info-item .value {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .info-item.highlight .value {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+
+        .reason-box {
+            background-color: #fafafa;
+            border-left: 4px solid #ff6f00;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .reason-box .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .reason-box .value {
+            font-size: 13px;
+            color: #1a1a1a;
+            font-style: italic;
+        }
+
+        .customer-section {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 12px;
+        }
+
+        .customer-section .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .customer-section .value {
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .action-items {
+            background-color: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .action-items h3 {
+            font-size: 14px;
+            color: #1565c0;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .action-items ol {
+            margin-left: 20px;
+            color: #1a1a1a;
+        }
+
+        .action-items li {
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .action-items li strong {
+            color: #1565c0;
+        }
+
+        .footer {
+            background-color: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            padding: 20px 24px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        .footer .timestamp {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: #d32f2f;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .urgency-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 12px 0;
+            padding: 12px;
+            background-color: #fff3e0;
+            border-radius: 4px;
+            border-left: 4px solid #ff6f00;
+        }
+
+        .urgency-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff6f00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .urgency-indicator p {
+            margin: 0;
+            font-size: 13px;
+            color: #e65100;
+            font-weight: 500;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header -->
+    <div class="header">
+        <h1>
+            <span class="alert-icon">⚠️</span>
+            Chargeback Dispute Filed
+        </h1>
+        <p>Immediate attention required for order [[${orderId}]]</p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Urgency Alert -->
+        <div class="urgency-indicator">
+            <div class="dot"></div>
+            <p>This requires your immediate attention. A customer has filed a chargeback dispute with their bank.</p>
+        </div>
+
+        <!-- Critical Info -->
+        <div class="alert-box">
+            <p>📍 Status: <strong>Dispute Filed</strong> — Action needed within 7 days</p>
+        </div>
+
+        <!-- Order Information -->
+        <div class="section">
+            <h2>Order Details</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="label">Order ID</div>
+                    <div class="value" th:text="${orderId}">ABC123</div>
+                </div>
+                <div class="info-item">
+                    <div class="label">Customer ID</div>
+                    <div class="value" th:text="${customerId}">CUST456</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dispute Information -->
+        <div class="section">
+            <h2>Dispute Information</h2>
+            <div class="reason-box">
+                <div class="label">Dispute Reason</div>
+                <div class="value" th:text="${disputeReason}">Customer claims unauthorized charge</div>
+            </div>
+        </div>
+
+        <!-- Action Items -->
+        <div class="action-items">
+            <h3>What You Need to Do</h3>
+            <ol>
+                <li><strong>Review</strong> the dispute details in your Stripe dashboard immediately</li>
+                <li><strong>Gather</strong> evidence (delivery proof, communications, refund records)</li>
+                <li><strong>Respond</strong> to the dispute within 7 days to avoid automatic loss</li>
+                <li><strong>Contact</strong> the customer if possible to resolve the issue</li>
+                <li><strong>Document</strong> everything for the chargeback process</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            <strong>🔗 Access Stripe Dashboard:</strong><br>
+            <a href="https://dashboard.stripe.com/disputes" style="color: #1976d2; text-decoration: none;">
+                View all disputes and submit evidence
+            </a>
+        </p>
+        <p class="timestamp">
+            Generated: [[${generatedAt}]]<br>
+            Sharp O'Clock Payment System
+        </p>
+    </div>
+</div>
+</body>
+</html>

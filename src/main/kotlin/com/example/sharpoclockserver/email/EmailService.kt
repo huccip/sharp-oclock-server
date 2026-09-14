@@ -79,6 +79,23 @@ class EmailService(
         )
     }
 
+    fun sendStripeChargeDisputeEmail(
+        orderId: String,
+        customerId: String,
+        disputeReason: String,
+    ) {
+        sendEmail(
+            recipient = mailFrom,
+            subject = "Stripe Charge Dispute",
+            template = "email/stripe-dispute",
+            infoValueMap = mapOf(
+                "customerId" to customerId,
+                "orderId" to orderId,
+                "disputeReason" to disputeReason,
+            )
+        )
+    }
+
     private fun sendEmail(
         recipient: String,
         subject: String,
