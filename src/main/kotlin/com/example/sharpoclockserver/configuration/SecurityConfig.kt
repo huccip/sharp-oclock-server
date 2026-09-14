@@ -160,7 +160,8 @@ class SecurityConfig {
                         HttpMethod.POST,
                         "/auth/sign-up",
                         "/auth/sign-in",
-                        "/auth/refresh"
+                        "/auth/refresh",
+                        "/checkout/payments/stripe/webhook"
                     )
                     .permitAll()
                     .anyRequest()
