@@ -54,8 +54,9 @@ data class Order(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     var status: OrderStatus = OrderStatus.DRAFT,
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status")
-    var paymentStatus: String? = null,
+    var paymentStatus: PaymentStatus? = null,
 
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: Instant = Instant.now(),
@@ -112,6 +113,13 @@ enum class OrderStatus {
     DRAFT,
     PLACED,
     DELIVERED,
+    CANCELLED
+}
+
+enum class PaymentStatus {
+    PENDING,
+    PAID,
+    REFUNDED,
     CANCELLED
 }
 

@@ -149,16 +149,16 @@ class OrderService(
 
         when (paymentMethod) {
             PaymentMethod.CASH_ON_DELIVERY -> {
-                cashOnDeliveryService.createPayment(
+                val paymentResult = cashOnDeliveryService.createPayment(
                     orderId = orderId.toString(),
                     customerId = customerId.toString()
                 )
+                if (paymentResult.statusCode != HttpStatus.CREATED && paymentResult.statusCode != HttpStatus.OK) {
+                    return paymentResult
+                }
             }
 
-            PaymentMethod.STRIPE -> {
-
-            }
-
+            PaymentMethod.STRIPE -> {}
             PaymentMethod.PAYPAL -> {}
         }
 

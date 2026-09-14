@@ -1,17 +1,16 @@
 package com.example.sharpoclockserver.checkout.order.payment.cash
 
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
-// POST https://localhost:8080/checkout/payments/cash/{orderId}/create-payment: updates the order's "paymentStatus" and "cashOnDeliveryPaymentId"
-// POST https://localhost:8080/checkout/payments/cash/{orderId}/cancel: updates the order's "paymentStatus" above and closes the order
-// POST https://localhost:8080/checkout/payments/cash/{orderId}/refund: updates the order's "paymentStatus" and closes the order, it can only be called during the refund duration
-/**
- * ADMIN ONLY
- * */
-// POST https://localhost:8080/checkout/payments/cash/{orderId}/confirm: updates the order's "paymentStatus" above then closes the order after the end of the refund duration
+// POST https://localhost:8080/checkout/payments/cash/{orderId}/create-payment: creates a COD payment record
+// POST https://localhost:8080/checkout/payments/cash/{orderId}/confirm: ADMIN confirms payment after delivery agency notification
+// POST https://localhost:8080/checkout/payments/cash/{orderId}/refund: customer requests refund within refund window
+// POST https://localhost:8080/checkout/payments/cash/{orderId}/cancel: customer cancels COD payment
 
 @RestController
 @RequestMapping("/checkout/payments/cash")
@@ -19,34 +18,24 @@ class CashOnDeliveryController(
     private val cashOnDeliveryService: CashOnDeliveryService
 ) {
 
-    data class ConfirmRequest(
-        val customerId: String,
-
-        val adminIdentifier: String,
-        val adminPassword: String,
-    )
-
     data class PaymentResponse(
         val orderId: String,
-
         val paymentId: String,
         val paymentMethod: String,
         val paymentStatus: String,
-
         val amountInCents: Long
     )
 
     data class RefundRequest(
+        @NotBlank
         val orderLineId: String,
     )
 
     data class RefundResponse(
         val orderId: String,
         val orderLineId: String,
-
         val paymentMethod: String,
         val paymentStatus: String,
-
         val refundAmountInCents: Long,
         val orderTotalAmountInCents: Long,
     )
@@ -63,17 +52,17 @@ class CashOnDeliveryController(
     @PostMapping("/{orderId}/confirm")
     fun confirmPayment(
         @PathVariable orderId: String,
-        confirmRequest: ConfirmRequest,
+        @RequestParam customerId: String,
     ): ResponseEntity<*> = cashOnDeliveryService.confirmPayment(
         orderId = orderId,
-        confirmRequest = confirmRequest
+        customerId = customerId
     )
 
     @PostMapping("/{orderId}/refund")
     fun refundPayment(
         @PathVariable orderId: String,
         @AuthenticationPrincipal jwt: Jwt,
-        @RequestBody refundRequest: RefundRequest
+        @RequestBody @Valid refundRequest: RefundRequest
     ): ResponseEntity<*> = cashOnDeliveryService.refund(
         orderId = orderId,
         customerId = jwt.subject,
