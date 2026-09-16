@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt</title>
+</head>
+<body style="font-family: sans-serif">
+<p>
+    Dear <strong th:text="${fullName}">Customer</strong>,
+</p>
+
+<p>Thank you for your order! Your payment has been successfully processed.</p>
+
+<h3>Order Details</h3>
+
+<ul>
+    <li>
+        Order ID: <span th:text="${orderId}"></span>
+    </li>
+    <li>
+        Total Amount: <span th:text="${#numbers.formatDecimal(totalPrice, 1, 2)}"></span> MAD
+    </li>
+</ul>
+
+<p>Your order is now being prepared for delivery. You will receive a tracking update soon.</p>
+
+<p>
+    If you have any questions about your order, please contact our support team.<br>
+</p>
+
+<p>
+    Best regards,<br>
+    <i>Sharp O'Clock Team</i>
+</p>
+</body>
+</html>
