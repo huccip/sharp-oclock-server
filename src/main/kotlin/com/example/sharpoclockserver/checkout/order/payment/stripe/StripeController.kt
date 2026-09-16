@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 
 // POST https://localhost:8080/checkout/payments/stripe/{orderId}/create-intent: creates a Stripe Payment Intent
 // POST https://localhost:8080/checkout/payments/stripe/{orderId}/confirm: confirms Stripe payment
-// POST https://localhost:8080/checkout/payments/stripe/{orderId}/webhook: handles Stripe's webhook updates (refund, cancellation, failure)
+// POST https://localhost:8080/checkout/payments/stripe/{orderId}/webhook: handles Stripe's webhook updates (refund, cancellation, failure, approval, dispute)
 
 @RestController
 @RequestMapping("/checkout/payments/stripe")

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -19,6 +20,7 @@ class StripeService(
     private val paymentReceiptEmail: String,
 ) {
 
+    @Transactional
     fun createPaymentIntent(
         orderId: String,
         customerId: String? = null,
@@ -67,6 +69,7 @@ class StripeService(
         )
     }
 
+    @Transactional
     fun confirmPayment(
         orderId: String,
         customerId: String? = null,

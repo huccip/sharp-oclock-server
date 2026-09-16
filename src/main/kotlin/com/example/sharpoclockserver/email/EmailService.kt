@@ -79,6 +79,24 @@ class EmailService(
         )
     }
 
+    fun sendPaypalPaymentReceiptEmail(
+        recipient: String,
+        customer: Customer,
+        orderId: String,
+        totalPriceCents: Long,
+    ) {
+        sendEmail(
+            recipient = recipient,
+            subject = "PayPal Payment Receipt",
+            template = "email/paypal-payment-receipt",
+            infoValueMap = mapOf(
+                "fullName" to customer.fullName,
+                "orderId" to orderId,
+                "totalPrice" to (totalPriceCents.toDouble() / 100),
+            )
+        )
+    }
+
     fun sendStripeChargeDisputeEmail(
         orderId: String,
         customerId: String,
@@ -92,6 +110,24 @@ class EmailService(
                 "customerId" to customerId,
                 "orderId" to orderId,
                 "disputeReason" to disputeReason,
+            )
+        )
+    }
+
+    fun sendPaypalPaymentReversalEmail(
+        orderId: String,
+        customer: Customer,
+        reversalReason: String,
+    ) {
+        sendEmail(
+            recipient = mailFrom,
+            subject = "PayPal Payment Reversal Alert",
+            template = "email/paypal-reversal",
+            infoValueMap = mapOf(
+                "customerId" to customer.id,
+                "fullName" to customer.fullName,
+                "orderId" to orderId,
+                "reversalReason" to reversalReason,
             )
         )
     }
