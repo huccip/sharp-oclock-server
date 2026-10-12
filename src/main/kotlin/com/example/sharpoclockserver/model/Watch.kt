@@ -56,7 +56,7 @@ data class Watch(
         Model: $name
         Description: $description
         Sizes: ${sizes.joinToString()}
-        Price in USD: ${price / 100.0}
+        Price in MAD: ${price / 100.0}
         Popularity: $isPopular
         New Arrival: $isNew
         Discounted: $isDiscounted
